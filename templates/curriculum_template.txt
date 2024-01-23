@@ -1,0 +1,8 @@
+Instructions: 
+"{instructions}"
+
+Completed Tasks so Far:
+"{completed_tasks}"
+
+Previously Failed Tasks:
+"{failed_tasks}"

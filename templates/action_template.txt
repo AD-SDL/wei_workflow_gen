@@ -1,0 +1,18 @@
+Tools:
+"{tool_info}"
+
+Example tool usage: 
+"{tool_demo}"
+
+Task:
+"{task}"
+
+Previous attempt:
+"{raw_yaml}"
+
+Execution error:
+"{exec_error}"
+
+Critique: 
+"{critique}"
+

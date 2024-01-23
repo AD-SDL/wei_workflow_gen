@@ -1,0 +1,4 @@
+  - name: Sciclops gets plate from stacks
+  - module: sciclops
+  - action: get_plate
+  - args:

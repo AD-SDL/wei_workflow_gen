@@ -1,0 +1,10 @@
+- name: pf400
+- description: 
+	This tool is a robot arm that has two inputs: 
+	1.) action: this is the action that the robot must select for it to complete a task. You must select an action from the "valid actions" list below. 
+	2.) args: this contains a dictionary of arguments as well as their valid inputs. These arguments are inputs for the action that the robot arm	chooses. You must select an action from the "valid args" list below. 
+- valid actions: [transfer, receive, wiggle_plate, flip_plate, rotate_plate]
+- valid args: ["source": [sciclops.exchange, sealer.default, peeler.default, ot2_pcr_alpha.deck1_cooler, ot2_growth_beta.deck2, ot2_cp_gamma.deck2, biometra.default, camera_module.plate_station, wc.trash], // These are the robot locations //
+			"target": [sciclops.exchange, sealer.default, peeler.default, ot2_pcr_alpha.deck1_cooler, ot2_growth_beta.deck2, ot2_cp_gamma.deck2, biometra.default, camera_module.plate_station, wc.trash], // These are the robot locations //
+			"source_plate_rotation": [narrow, wide], // rule: use narrow for sealer, peeler, sciclops, camera, trash and use wide for ot2 and biometra //
+			"target_plate_rotation": [narrow, wide]] // rule: use narrow for sealer, peeler, sciclops, camera, trash and use wide for ot2 and biometra//

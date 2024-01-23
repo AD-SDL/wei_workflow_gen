@@ -1,0 +1,7 @@
+  - name: pf400 moves plate from peeler to camera
+  - action: transfer
+  - module: 
+  - args:
+    - source: peeler.default
+    - source_plate_rotation: narrow
+    - target_plate_rotation: narrow

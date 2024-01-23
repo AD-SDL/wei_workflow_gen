@@ -1,0 +1,63 @@
+- name: Biowater
+  source: opentrons_10_tuberack:A1
+  destination: opentrons_10_tuberack:C2
+  volume: [676, 676, 676]
+  mix_cycles: 0
+  mix_volume: 0
+  drop_tip: [False, False, True]
+- name: 5x Reaction Buffer
+  source: opentrons_24_tuberack:A3
+  destination: opentrons_10_tuberack:C2
+  volume: [576]
+  mix_cycles: 3
+  mix_volume: 500
+  drop_tip: [True]
+- name: DNA Polymerase
+  source: opentrons_24_tuberack:A1
+  destination: opentrons_10_tuberack:C2
+  volume: [12, 12]
+  mix_cycles: 3
+  mix_volume: 20
+  drop_tip: [False, True]
+- name: DNTPs
+  source: opentrons_24_tuberack:A5
+  destination: opentrons_10_tuberack:C2
+  volume: [108]
+  mix_cycles: 3
+  mix_volume: 600
+  drop_tip: [True]
+- name: GC Enhancer
+  source: opentrons_24_tuberack:B3
+  destination: opentrons_10_tuberack:C2
+  volume: [720]
+  mix_cycles: 7
+  mix_volume: 700
+  drop_tip: [True]
+- name: Master Mix
+  source: opentrons_10_tuberack:C2
+  destination: dest:Destination
+  volume: [15, 15]
+  mix_cycles: 0
+  mix_volume: 0
+  drop_tip: [True, True]
+- name: Forward Primer
+  source: forward:Forward Primer
+  destination: dest:Destination
+  volume: [20]
+  mix_cycles: 3
+  mix_volume: 15
+  drop_tip: [True]
+- name: Backward Primer
+  source: backward:Backward Primer
+  destination: dest:Destination
+  volume: [20]
+  mix_cycles: 3
+  mix_volume: 15
+  drop_tip: [True]
+- name: Template
+  source: template:DNA
+  destination: dest:Destination
+  volume: [20]
+  mix_cycles: 3
+  mix_volume: 15
+  drop_tip: [True]
