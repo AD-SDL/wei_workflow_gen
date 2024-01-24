@@ -81,7 +81,7 @@ class ActionAgent(LabWorker):
         return result
     
     # TODO: GIVE WELL LOCATIONS AND SEE IF IT CAN GENERATE THE PROPER LOCATIONS AND DESTINATIONS
-    def pcr_policy_sample(self, task:str, 
+    def generate(self, task:str, 
                    raw_yaml:str, tool:str, 
                    exec_error:str,
                    tool_info:str, tool_demo:str, 

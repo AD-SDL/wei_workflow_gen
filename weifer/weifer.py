@@ -5,6 +5,10 @@ from utils.parser_utils import *
 from utils.general_utils import *
 
 
+def load_api_key(path:str) -> str: 
+    api_key = txtfile_to_string(path)
+    return api_key
+
 class Weifer(LabWorker): 
     def __init__(self, ): 
         super().__init__()
@@ -15,12 +19,14 @@ if __name__=="__main__":
 
     parser = argparse.ArgumentParser(description="Wei Generation From Natural Language")
 
-    parser.add_argument('--openai_api_key', default='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', type=str)
+    parser.add_argument('--api_key_path', default='/Users/BrianHsu/Desktop/GitHub/openai_api_key_mine.txt', type=str)
     parser.add_argument('--tool_path', default=f"{os.getcwd()}/weifer/tool_info/tool_info.csv", type=str)
     args = parser.parse_args()
 
-    os.environ["OPENAI_API_KEY"] = args.openai_api_key
-    openai.api_key = args.openai_api_key
+    api_key = load_api_key(args.api_key_path)
+
+    os.environ["OPENAI_API_KEY"] = api_key 
+    openai.api_key = api_key
 
     num_tries = 5
     task = "use pf400 to move plate from sciclops to ot2"
@@ -38,7 +44,7 @@ if __name__=="__main__":
     tool_fsl = toolsagent.query_tool_fsl(token=token, df=tools_df)
     for i in range(num_tries): 
         # proposing the next task 
-        output = actionagent.pcr_policy_sample(task=task, raw_yaml=raw_yaml, 
+        output = actionagent.generate(task=task, raw_yaml=raw_yaml, 
                                                 tool=token, exec_error=exec_error,
                                                 tool_info=tool_info, tool_demo=tool_fsl)     
         # if parsing fails, then update exec_error, and yaml_code
