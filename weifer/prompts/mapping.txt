@@ -27,9 +27,10 @@ Given the format above, below is the tool that you can use, what it does, and th
 
 First, I will give you an initial prompt in the following format: 
 
-Instructions: // This is a description for the task that you need to complete using the tool. You will convert this task into a formatted output using the tool that is given to you above. //
+Task: // This is a description for the task that you need to complete using the tool. You will convert this task into a formatted output using the tool that is given to you above. //
 
 You will respond to me in the following format: 
+Output:
 <//The name of the tool in brackets. Do not put anything more.//>
 
 IMPORTANT. DO NOT TELL ME ANY MORE INFORMATION ON HOW TO USE THE TOOL. JUST GIVE ME THE TOOLS IN BRACKETS IN YOUR OUTPUT. DO THIS OR YOU WILL BE PUNISHED.
@@ -37,10 +38,12 @@ IMPORTANT. DO NOT TELL ME ANY MORE INFORMATION ON HOW TO USE THE TOOL. JUST GIVE
 An example for how to use the tool is shown below: 
 
 Here's an example input:
+Task:
 1. Sciclops gets plate from stacks.
 2. pf400 moves plate from sciclops to ot2.
 
 Here's an example output: 
+Output:
 1. <sciclops>
 2. <pf400>
 

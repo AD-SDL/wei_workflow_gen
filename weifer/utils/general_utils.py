@@ -23,7 +23,7 @@ def load_agent_prompt(agent:str) -> str:
     - curriculum
     """
     auto_path = os.getcwd()
-    file_path = f"{auto_path}/explorer/prompts/{agent}.txt"
+    file_path = f"{auto_path}/weifer/prompts/{agent}.txt"
     with open(file_path, "r") as file: 
         prompt_string = file.read() 
     return prompt_string
@@ -31,7 +31,7 @@ def load_agent_prompt(agent:str) -> str:
 def load_template(agent:str) -> str: 
     """Gets template prompts as a str by using getcwd()"""
     auto_path = os.getcwd()
-    file_path = f"{auto_path}/explorer/templates/{agent}_template.txt"
+    file_path = f"{auto_path}/weifer/templates/{agent}_template.txt"
     with open(file_path, "r") as file: 
         prompt_string = file.read() 
     return prompt_string
