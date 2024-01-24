@@ -13,8 +13,8 @@ class MappingAgent(LabWorker):
                  temperature=0, 
                  model_type="gpt-3.5-turbo", 
                  verbose=True, 
-                 agent_type="action", 
-                 template_type="action"): 
+                 agent_type="mapping", 
+                 template_type="mapping"): 
         super().__init__()
         
         self.temperature=temperature
@@ -22,6 +22,12 @@ class MappingAgent(LabWorker):
         self.verbose=verbose
         self.agent_type=agent_type
         self.template_type=template_type
+        self.llm = ChatOpenAI(temperature=self.temperature, 
+                    model_name=self.model_type)
+        
+    def map_task(self, task:str) -> str: 
+        final_input = {"task":task}
+        raw_output = self.chain.run(final_input)
+        raw_token = preprocess_raw_output(raw_output)
+        return raw_token
 
-
-    def lod
