@@ -1,7 +1,0 @@
-- name: sciclops 
-- description: 
-	This tool is a robot arm that has two inputs: 
-	1.) action: this is the action that the robot must select for it to complete a task. You must select an action from the "valid actions" list below. 
-	2.) args: this contains a dictionary of arguments as well as their valid inputs. These arguments are inputs for the action that the robot arm chooses. You must select an action from the "valid args" list below. 
-- valid actions: [get_plate, throw_fit, poop_pants, climb_crib]
-- valid args: ["loc": ["tower2", "tower1", "tower3", "tower4"]]
