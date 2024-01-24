@@ -24,7 +24,7 @@ if __name__=="__main__":
 
     toolsagent = ToolsAgent()
     actionagent = ActionAgent()
-    mappingagent = 
+    mappingagent = MappingAgent()
 
     tools_df = toolsagent.create_tools_df(args.tool_path)
 

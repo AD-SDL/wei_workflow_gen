@@ -25,7 +25,7 @@ class ActionAgent(LabWorker):
         
     
     def generate_raw(self, task:str, raw_yaml:str,
-                      exec_error:str, critique:str, 
+                      exec_error:str,
                       tool_info:str, tool_demo:str
                       ) -> yaml: 
         """Takes in previous round info + task + tool info + tool fsl --> return raw str (non_ot2)
@@ -34,19 +34,17 @@ class ActionAgent(LabWorker):
                        "tool_demo": tool_demo,
                        "task": task, 
                        "raw_yaml": raw_yaml, 
-                       "exec_error": exec_error, 
-                       "critique": critique}
+                       "exec_error": exec_error}
         raw_output = self.chain.run(final_input)
         return raw_output
 
     def generate_raw_ot2(self, task:str, raw_yaml:str, 
-                          exec_error:str, critique:str): 
+                          exec_error:str): 
         """Takes in previous round info + task + tool info + tool fsl --> return raw str (non_ot2)
         Must be ran on a unique chain/agent"""
         final_input = {"task": task, 
                        "raw_yaml": raw_yaml, 
-                       "exec_error": exec_error, 
-                       "critique": critique} 
+                       "exec_error": exec_error} 
         raw_output = self.ot2chain.run(final_input)
         return raw_output
     
@@ -85,7 +83,7 @@ class ActionAgent(LabWorker):
     # TODO: GIVE WELL LOCATIONS AND SEE IF IT CAN GENERATE THE PROPER LOCATIONS AND DESTINATIONS
     def pcr_policy_sample(self, task:str, 
                    raw_yaml:str, tool:str, 
-                   exec_error:str, critique:str,
+                   exec_error:str,
                    tool_info:str, tool_demo:str, 
                    ): 
         """takes in tool info:str and task:str and returns a dict{code} if successful or str:error if unsuccessful parsing
@@ -95,14 +93,14 @@ class ActionAgent(LabWorker):
             # steps to run the experiment
             instructions = load_instructions(type="ot2")
             raw_output = self.generate_raw_ot2(task=instructions, raw_yaml=raw_yaml, 
-                                            exec_error=exec_error, critique=critique)
+                                            exec_error=exec_error)
             raw_yaml = preprocess_raw_output(raw_output)
             result = self.parse_output(raw_yaml=raw_yaml, tool_name=tool)
             return {"result":result, 
                     "raw_yaml":raw_yaml}
         
         raw_output = self.generate_raw(task=task, raw_yaml=raw_yaml, exec_error=exec_error, 
-                                    critique=critique, tool_info=tool_info, tool_demo=tool_demo)
+                                       tool_info=tool_info, tool_demo=tool_demo)
         raw_yaml = preprocess_raw_output(raw_output)
         # TODO: change all the raw_output to raw_yaml in the parsers
         # dict if correct, str if not 
