@@ -1,0 +1,6 @@
+  - name: Seal plate in sealer
+  - module: sealer
+  - action: seal
+  - args:
+    - time: payload:seal.time
+    - temperature: 175

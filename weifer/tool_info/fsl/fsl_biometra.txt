@@ -1,0 +1,26 @@
+Task: 
+Run the biometra program for 3 cycles.
+
+Previous attempt:
+- name: Run biometra program 3 times
+- module: biometra
+- action: close_lid
+- args:
+   - program_n: 3
+
+Execution error: 
+invalid <action>: <close_lid> is not a valid <action> that can be used with <program_n>
+
+Critique: 
+yaml output is wrong, we are tasked with running a biometra program. Therefore, close_lid is not the correct action. We should use run_program instead.
+
+Here's an example output: 
+Explain: 
+Based on the execution error and critique, close_lid is not the correct action. Because our task is to run the biometra program, we need to use run_program as the correct action.
+
+Output: 
+- name: Run biometra program 3 times
+- module: biometra
+- action: run_program
+- args:
+   - program_n: 3

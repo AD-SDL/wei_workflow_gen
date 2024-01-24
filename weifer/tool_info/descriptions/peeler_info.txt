@@ -1,0 +1,8 @@
+- name: peeler
+- description: 
+	This tool is a PCR plate peeler that has one input: 
+	1.) action: this is the action that the robot must select for it to complete a task. You must select an action from the "valid actions" list below. You must select an action from the "valid args" list below. 
+
+- valid actions: [peel, throw_away, wait]
+
+

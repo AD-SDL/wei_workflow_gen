@@ -1,0 +1,212 @@
+Tool Name,Description,Prompt,Demo
+biometra,This tool controls the biometra themocycler machine,"- name: biometra
+- description: 
+	This tool is a biometra thermocycler that has two inputs: 
+	1.) action: this is the action that the robot must select for it to complete a task. You must select an action from the ""valid actions"" list below. 
+	2.) args: this contains a dictionary of arguments as well as their valid inputs. These arguments are inputs for the action that the robot arm chooses. As an important note, you would only use the args section if run_program action is chosen from the list of actions shown below. You must select an action from the ""valid args"" list below. 
+- valid actions: [close_lid, run_program, open_lid]
+- valid args: [program_n: // integer number goes here. //] // if action is close_lid or open_lid, DO NOT EVEN INCLUDE ARGS IN YOUR OUTPUT AND JUST RETURN THE ACTION. //","Task: 
+Run the biometra program for 3 cycles.
+
+Previous attempt:
+- name: Run biometra program 3 times
+- module: biometra
+- action: close_lid
+- args:
+   - program_n: 3
+
+Execution error: 
+invalid <action>: <close_lid> is not a valid <action> that can be used with <program_n>
+
+Critique: 
+yaml output is wrong, we are tasked with running a biometra program. Therefore, close_lid is not the correct action. We should use run_program instead.
+
+Here's an example output: 
+Explain: 
+Based on the execution error and critique, close_lid is not the correct action. Because our task is to run the biometra program, we need to use run_program as the correct action.
+
+Output: 
+- name: Run biometra program 3 times
+- module: biometra
+- action: run_program
+- args:
+   - program_n: 3"
+peeler,This tool controls the peeler machine,"- name: peeler
+- description: 
+	This tool is a PCR plate peeler that has one input: 
+	1.) action: this is the action that the robot must select for it to complete a task. You must select an action from the ""valid actions"" list below. You must select an action from the ""valid args"" list below. 
+
+- valid actions: [peel, throw_away, wait]","Task: 
+Step 1: Peel the lid
+
+Previous attempt: 
+- name: peel plate
+- module: peeler
+- action: peeling
+
+Execution error: 
+invalid <action>: <peeling> is not a valid <action>
+
+Critique: 
+yaml output does not follow task since peeling is not a valid action. Use peel instead.
+
+Here's the corresponding example output: 
+Explain: 
+Based on the execution error and critique, peeling is not a valid action. We should use peel instead.
+
+Output:
+- name: peel plate
+- module: peeler
+- action: peel"
+ot2,This tool controls the ot2 alpha PCR reaction machine,"You are a helpful PCR lab assistant that can complete any series of lab directions specified by me. Your goal is to help me use tools to run successful PCR students so that I can become the best PCR lab scientist in the world.
+
+You will be given a set of custom code tools that are written in YAML format. That you will use to complete any series of lab directions specified by me. YOU CAN ONLY SELECT THE TOOLS PRESENTED TO YOU. YOU CAN ONLY USE THESE TOOLS WHEN COMPLETING YOUR DIRECTIONS OR YOU WILL BE PUNISHED. You DO NOT have to use all of the tools, but any actions that you take must use a tool. Tools will be given to you in the following format: 
+
+FORMAT OF TOOL:
+- name: // this is the name of the tool // 
+- description: // this is a description for how the tool is used //
+- valid actions: // this is a list of valid actions that this tool can use // 
+- valid args: // this is a list of valid arguments the tool uses for its actions. //
+
+Given the format above, below is the tool that you can use, what it does, and the inputs you need to use the tool: 
+- name: ot2_pcr_alpha
+- description: 
+	This tool is a PCR robot that has two inputs: 
+	1.) action: this is the action that the robot must select for it to complete a task. You must select an action from the ""valid actions"" list below. 
+	2.) args: this contains a dictionary of arguments as well as their valid inputs. These arguments are inputs for the action that the robot chooses. You must select an action from the ""valid args"" list below.
+- valid actions: [run_protocol, repeat_protocol, stop_protocol]
+- valid args: [""config_path"": [// string path goes here //], 
+			""use_existing_resources"": [True, False]]
+
+First, I will give you an initial prompt in the following format: 
+
+Instructions: // This is a description for the task that you need to complete using the tool. You will convert this task into a formatted output using the tool that is given to you above. //
+
+You will respond to me in the following format: 
+- name: // This is a concise and single sentence description of what the task you are doing is. //
+- module: // this is the tool name you use. In this case it is ot2_pcr_alpha. //
+- action: // this is the action that you select from the ""valid actions"" shown above. //
+- args: // this is the argument that you select from the ""valid args"" shown above. //
+
+An example for how to use the tool is shown below: 
+
+Here's an example input:
+Step 1: Run ot2 ""mix reactions"" protocol at path ./pcr_protocol/PCR_prep_full_plate_multi_noresource.yaml, no resources
+
+Here's an example output: 
+- name: ot2 runs the ""Mix reactions"" protocol
+- module: ot2_pcr_alpha
+- action: run_protocol
+- args:
+   - config_path: ./pcr_protocol/PCR_prep_full_plate_multi_noresource.yaml
+   - use_existing_resources: False",
+pf400,This tool controls the Pf400 robot arm machine,"- name: pf400
+- description: 
+	This tool is a robot arm that has two inputs: 
+	1.) action: this is the action that the robot must select for it to complete a task. You must select an action from the ""valid actions"" list below. 
+	2.) args: this contains a dictionary of arguments as well as their valid inputs. These arguments are inputs for the action that the robot arm	chooses. You must select an action from the ""valid args"" list below. 
+- valid actions: [transfer, receive, wiggle_plate, flip_plate, rotate_plate]
+- valid args: [""source"": [sciclops.exchange, sealer.default, peeler.default, ot2_pcr_alpha.deck1_cooler, ot2_growth_beta.deck2, ot2_cp_gamma.deck2, biometra.default, camera_module.plate_station, wc.trash], // These are the robot locations //
+			""target"": [sciclops.exchange, sealer.default, peeler.default, ot2_pcr_alpha.deck1_cooler, ot2_growth_beta.deck2, ot2_cp_gamma.deck2, biometra.default, camera_module.plate_station, wc.trash], // These are the robot locations //
+			""source_plate_rotation"": [narrow, wide], // rule: use narrow for sealer, peeler, sciclops, camera, trash and use wide for ot2 and biometra //
+			""target_plate_rotation"": [narrow, wide]] // rule: use narrow for sealer, peeler, sciclops, camera, trash and use wide for ot2 and biometra//","Task: 
+Use pf400 to move the PCR plate from the ot2 alpha machine to the sciclops robot. 
+
+Previous attempt: 
+- name: pf400 moves plate from ot2 alpha deck cooler to sciclops
+- module: pf400 
+- action: transfer 
+- args: 
+   - source: ot2_pcr_alpha.deck1_cooler
+   - target: sciclops.exchange
+   - source_plate_rotation: narrow
+   - target_plate_rotation: wide
+
+Execution error: 
+invalid <source_plate_rotation>: <narrow> is not a valid <source_plate_rotation> for <ot2_pcr_alpha.deck1_cooler>
+invalid <target_plate_rotation>: <wide> is not a valid <target_plate_rotation> for <sciclops.exchange>
+
+Critique: 
+yaml output does not correspond to the rules of the tool, since narrow is not a valid source_plate_rotation for ot2_pcr_alpha.deck1_cooler, and wide is not a valid rotation for sciclops.exchange. 
+
+Here's an example output: 
+Explain: 
+Based on the execution error and critique, the source_plate_rotation should be wide since the source location is ot2_pcr_alpha.deck1_cooler and the target_plate_rotation should be narrow since the target location is sciclops.exchange.
+
+Output:
+- name: pf400 moves plate from ot2 alpha deck cooler to sciclops
+- module: pf400 
+- action: transfer 
+- args: 
+   - source: ot2_pcr_alpha.deck1_cooler
+   - target: sciclops.exchange
+   - source_plate_rotation: wide 
+   - target_plate_rotation: narrow"
+sciclops,This tool controls the Sciclops arm machine,"- name: sciclops 
+- description: 
+	This tool is a robot arm that has two inputs: 
+	1.) action: this is the action that the robot must select for it to complete a task. You must select an action from the ""valid actions"" list below. 
+	2.) args: this contains a dictionary of arguments as well as their valid inputs. These arguments are inputs for the action that the robot arm chooses. You must select an action from the ""valid args"" list below. 
+- valid actions: [get_plate, throw_fit, poop_pants, climb_crib]
+- valid args: [""loc"": [""tower2"", ""tower1"", ""tower3"", ""tower4""]]","Task: 
+Use sciclops tool to get the PCR plate from the stacks in tower2
+
+Previous attempt: 
+- name: Sciclops gets plate from stacks
+- module: sciclops
+- action: run_rxn
+- args: 
+   - loc: ""tower2""
+
+Execution error: 
+invalid <action>: <run_rxn> is not a valid <action>
+
+Critique: 
+yaml output does not corresponding to the guidelines for the tool, because run_rxn is an invalid action. 
+
+Here's an example output: 
+Explain: 
+Based on the execution error and critique, run_rxn is not a valid action. Given our task to get the plate from tower2, we need to use get_plate
+
+Output: 
+- name: Sciclops gets plate from stacks
+- module: sciclops 
+- action: get_plate 
+- args: 
+   - loc: ""tower2"""
+sealer,This tool controls the sealer machine,"- name: sealer
+- description: 
+	This tool is a sealer robot that has two inputs: 
+	1.) action: this is the action that the robot must select for it to complete a task. You must select an action from the ""valid actions"" list below. 
+	2.) args: this contains a dictionary of arguments as well as their valid inputs. These arguments are inputs for the action that the robot chooses. 
+
+You must select an action from the ""valid args"" list below. 
+- valid actions: [seal, spin_around, toss_up]
+- valid args: [time: // integer goes here //, temperature: // integer goes here //]
+   - temperature: 200","Task: 
+Seal plate in sealer at a temperature of 300 degrees Celsius for 50 minutes
+
+Previous attempt: 
+- name: Seal plate in sealer
+- module: sealer
+- action: seal
+- args: 
+   - time: 20
+   - temperature: 175
+
+Execution error: 
+None
+
+Critique: 
+yaml output does not follow the times 
+
+Here's the corresponding example output: 
+Explain: 
+Based on the execution error and critique, I provided the wrong time and temperature. The time should be 50 and temperature should be 300.
+
+Output:
+- name: Seal plate in sealer
+- module: sealer
+- action: seal
+   - time: 50
+   - temperature: 300"

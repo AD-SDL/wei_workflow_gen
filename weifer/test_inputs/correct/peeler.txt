@@ -1,0 +1,3 @@
+  - name: Peel plate
+  - module: peeler
+  - action: peel

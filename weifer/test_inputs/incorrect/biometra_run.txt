@@ -1,0 +1,4 @@
+  - name: Run biometra program
+  - module: biometra
+  - action: run_program
+  - args:

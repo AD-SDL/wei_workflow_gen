@@ -1,0 +1,11 @@
+Task: 
+"{task}"
+
+Previous Attempt: 
+"{raw_yaml}"
+
+Execution Error: 
+"{exec_error}"
+
+Critique: 
+"{critique}"
