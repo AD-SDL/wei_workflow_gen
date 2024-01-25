@@ -25,9 +25,9 @@ class Weifer(LabWorker):
         self.temperature = temperature
         self.verbose = verbose
         
-        self.tool_path = tool_path
         self.raw_yaml = raw_yaml
         self.exec_error = exec_error
+        self.tool_path = tool_path
 
         self.toolsagent = ToolsAgent(model_type=self.model_type, 
                                      temperature=self.temperature,
@@ -39,24 +39,23 @@ class Weifer(LabWorker):
                                          temperature=self.temperature,
                                          verbose=self.verbose)
         
-    def setup_agents(self, tool_path):
+    def setup_agents(self):
         self.actionagent.init_chain("action", "action")
         self.mappingagent.init_chain(agent_type="mapping", template_type="mapping")
-        self.tools_df = self.toolsagent.create_tools_df(tool_path) 
+        self.tools_df = self.toolsagent.create_tools_df(self.tool_path) 
+        return None
 
     def retrieve_tool(self, token, tools_df): 
-        return None
+        tool_info = self.toolsagent.query_tool_info(token=token, df=tools_df)
+        tool_fsl = self.toolsagent.query_tool_fsl(token=token, df=tools_df)
+        return {"tool_info":tool_info, 
+                "tool_fsl":tool_fsl}
 
-    
-    def create_vectorbase(self, ): 
-        return None
-
-
-    def generate_yaml(self, task, 
+    def generate_yaml(self, task, token,
                      raw_yaml, exec_error, 
                      tool_info, tool_fsl):
         try:
-            for i in range(num_tries): 
+            for i in range(self.num_tries): 
                 output = self.actionagent.generate(task=task, raw_yaml=raw_yaml, 
                                             tool=token, exec_error=exec_error,
                                             tool_info=tool_info, tool_demo=tool_fsl)     
@@ -70,10 +69,19 @@ class Weifer(LabWorker):
             error = e 
             return f"Error parsing yaml output (before program execution):\n{error}"
         
-
     def generate_wei(self, task:str) -> dict: 
-
-        return None 
+        self.setup_agents()
+        token = self.mappingagent.map_task(task=task)
+        tool = self.retrieve_tool(token=token, tools_df=self.tools_df)
+        lab_state={"task":task,
+                   "token":token, 
+                   "raw_yaml":self.raw_yaml, 
+                   "exec_error":self.exec_error, 
+                   "tool_fsl":tool["tool_fsl"], 
+                   "tool_info":tool["tool_info"]}
+        
+        result = self.generate_yaml(**lab_state)
+        return result 
 
 
 
@@ -90,49 +98,45 @@ if __name__=="__main__":
     os.environ["OPENAI_API_KEY"] = api_key 
     openai.api_key = api_key
 
-    toolsagent = ToolsAgent()
-    actionagent = ActionAgent()
-    mappingagent = MappingAgent()
+    weifer = Weifer()
 
-    actionagent.init_chain("action", "action")
-    mappingagent.init_chain(agent_type="mapping", template_type="mapping")
-    tools_df = toolsagent.create_tools_df(args.tool_path)
+    task = "use pf400 to move plate from scilcops to ot2"
+
+    result = weifer.generate_wei(task=task)
+
+    print(result)
+    print("Ending")
 
 
-    task = "use pf400 to move plate from sciclops to ot2"
-    token = mappingagent.map_task(task=task)
-    tool_info = toolsagent.query_tool_info(token=token, df=tools_df)
-    tool_fsl = toolsagent.query_tool_fsl(token=token, df=tools_df)
+
+
+
+
+
+
+    # toolsagent = ToolsAgent()
+    # actionagent = ActionAgent()
+    # mappingagent = MappingAgent()
+
+    # actionagent.init_chain("action", "action")
+    # mappingagent.init_chain(agent_type="mapping", template_type="mapping")
+    # tools_df = toolsagent.create_tools_df(args.tool_path)
+
+
+    # task = "use pf400 to move plate from sciclops to ot2"
+    # token = mappingagent.map_task(task=task)
+    # tool_info = toolsagent.query_tool_info(token=token, df=tools_df)
+    # tool_fsl = toolsagent.query_tool_fsl(token=token, df=tools_df)
     
-    num_tries = 5
-    raw_yaml = "None"
-    exec_error="None"
-    lab_state={"task":task, 
-            "raw_yaml":raw_yaml, 
-            "exec_error":exec_error, 
-            "tool_fsl":tool_fsl, 
-            "tool_info":tool_info}
-
-
-    def generate_wei(task, raw_yaml, 
-                     exec_error, tool_info, 
-                     tool_fsl):
-        try:
-            for i in range(num_tries): 
-                output = actionagent.generate(task=task, raw_yaml=raw_yaml, 
-                                                        tool=token, exec_error=exec_error,
-                                                        tool_info=tool_info, tool_demo=tool_fsl)     
-                if type(output["result"]) == dict: 
-                    break
-                exec_error = output["result"]
-                raw_yaml = output["raw_yaml"]
-            assert type(output["result"])==dict, f"Generating process failed for your task on the {i}th try, here is my best try: {output['raw_output']}"
-            return output["result"]
-        except Exception as e: 
-            error = e 
-            return f"Error parsing yaml output (before program execution):\n{error}"
-
-    result = generate_wei(**lab_state)
+    # num_tries = 5
+    # raw_yaml = "None"
+    # exec_error="None"
+    # lab_state={"task":task, 
+    #         "raw_yaml":raw_yaml, 
+    #         "exec_error":exec_error, 
+    #         "tool_fsl":tool_fsl, 
+    #         "tool_info":tool_info}
+    # result = generate_wei(**lab_state)
 
 
     
