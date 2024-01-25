@@ -21,8 +21,6 @@ Previous attempt: // This is a previous failed attempt to convert the task into 
 
 Execution error: // This is the execution error corresponding to your previous failed attempt to convert the task into the formatted output correctly. If this is the first time you are attempting this task, this section will be "none". //
 
-Critique: // This is a critique from an expert that will tell you if your previous attempt was correct in solving the task given to you or not. If this is the first time you are attempting this task, this section will be "None". //
-
 You will respond to me in the following format: 
 FORMAT OF RESPONSE:
 Explain: // Given the task you need to complete and the tool, what do you need to do? If there is a previously failed attempt listed above, what does the execution error and/or critique imply? What do you need to modify in your output so that it is correct? //
