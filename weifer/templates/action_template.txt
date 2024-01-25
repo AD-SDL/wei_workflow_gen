@@ -13,6 +13,4 @@ Previous attempt:
 Execution error:
 "{exec_error}"
 
-Critique: 
-"{critique}"
 
