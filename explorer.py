@@ -13,9 +13,7 @@ class Explorer():
 if __name__  == "__main__":
 
     parser = argparse.ArgumentParser(description="YAML Generation From Natural Language")
-    # Argonne key: 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
-    # CURRENTLY SET TO ARGONNE
-    parser.add_argument('--openai_api_key', default='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', type=str)
+    parser.add_argument('--openai_api_key', default=None, type=str)
     parser.add_argument('--model_type', default='gpt-3.5-turbo', type=str)
     parser.add_argument('--verbose', default=True, type=str)
     parser.add_argument('--temperature', default=0, type=int)
