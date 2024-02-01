@@ -15,7 +15,7 @@ if __name__=="__main__":
 
     parser = argparse.ArgumentParser(description="Wei Generation From Natural Language")
 
-    parser.add_argument('--openai_api_key', default='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', type=str)
+    parser.add_argument('--openai_api_key', default=None, type=str)
     parser.add_argument('--tool_path', default=f"{os.getcwd()}/weifer/tool_info/tool_info.csv", type=str)
     args = parser.parse_args()
 
