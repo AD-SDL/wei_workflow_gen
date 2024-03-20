@@ -1,2 +1,0 @@
-  - name: Close lid of biometra
-  - module: biometra

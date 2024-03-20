@@ -2,7 +2,6 @@
 name = "wei_workflow_gen"
 version = "0.0.1"
 description = "Create workflows from natural language input"
-authors = [{name = "Brian Hsu", email = "brianhsu636@gmail.com"}, {name = "Ryan D. Lewis", email = "ryan.lewis@anl.gov"}]
 dependencies = [
     "ad_sdl.wei"
 ]

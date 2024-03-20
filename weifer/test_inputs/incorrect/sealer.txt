@@ -1,5 +1,0 @@
-  - name: Seal plate in sealer
-  - module: sealer
-  - action: seal
-  - args:
-    - temperature: 175
