@@ -1,7 +1,0 @@
-- name: biometra
-- description: 
-	This tool is a biometra thermocycler that has two inputs: 
-	1.) action: this is the action that the robot must select for it to complete a task. You must select an action from the "valid actions" list below. 
-	2.) args: this contains a dictionary of arguments as well as their valid inputs. These arguments are inputs for the action that the robot arm chooses. As an important note, you would only use the args section if run_program action is chosen from the list of actions shown below. You must select an action from the "valid args" list below. 
-- valid actions: [close_lid, run_program, open_lid]
-- valid args: [program_n: // integer number goes here. //] // if action is close_lid or open_lid, DO NOT EVEN INCLUDE ARGS IN YOUR OUTPUT AND JUST RETURN THE ACTION. //

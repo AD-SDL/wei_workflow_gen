@@ -1,9 +1,0 @@
-1.) Transfer Biowater liquid 3 times with 676 uL each to the master mix tube. Drop the tip on the last time. 
-2.) Transfer 720 uL of 5x Reaction Buffer to the master mix tube with 3 mix cycles and 500 uL mix volume per cycle. Drop the tip after. 
-3.) Transfer 12 uL of DNA Polymerase 2 times to the master mix tube with 3 mix cycles and 20 uL of mix volume per cycle. Drop the tip on the last time.
-4.) Transfer 108 uL of DNTPs to the master mix tube with 3 mix cycles and 600 uL of mix volume per cycle. Drop the tip after.
-5.) Transfer 720 uL of GC Enhancer to the master mix tube with 7 mix cycles and 700 uL of mix volume per cycle. Drop the tip after. 
-6.) Transfer 15 uL of Master Mix liquid 2 times to the reaction plate. Drop the tip.
-7.) Transfer 20 uL of forward primer liquid 1 times with 3 mix cycles and 15 uL of mix volume per cycle to the reaction plate. Drop the tip. 
-8.) Transfer 20 uL of backward primer liquid 1 times with 3 mix cycles and 15 uL of mix volume per cycle to the reaction plate. Drop the tip. 
-9.) Transfer 20 uL of template liquid 1 times with 3 mix cycles and 15 uL of mix volume per cycl to the reaction plate. Drop the tip.

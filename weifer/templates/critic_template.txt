@@ -1,9 +1,0 @@
-Tools:
-"{tool_info}"
-
-Task:
-"{task}"
-
-YAML:
-"{raw_output}"
-

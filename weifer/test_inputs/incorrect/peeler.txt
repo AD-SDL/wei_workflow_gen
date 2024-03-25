@@ -1,2 +1,0 @@
-  - name: Peel plate
-  - module: peeler

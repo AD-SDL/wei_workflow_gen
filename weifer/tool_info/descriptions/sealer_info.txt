@@ -1,9 +1,0 @@
-- name: sealer
-- description: 
-	This tool is a sealer robot that has two inputs: 
-	1.) action: this is the action that the robot must select for it to complete a task. You must select an action from the "valid actions" list below. 
-	2.) args: this contains a dictionary of arguments as well as their valid inputs. These arguments are inputs for the action that the robot chooses. 
-
-You must select an action from the "valid args" list below. 
-- valid actions: [seal, spin_around, toss_up]
-- valid args: [time: // integer goes here //, temperature: // integer goes here //]

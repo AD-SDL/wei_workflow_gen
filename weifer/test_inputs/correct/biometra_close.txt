@@ -1,3 +1,0 @@
-  - name: Close lid of biometra
-  - module: biometra
-  - action: close_lid  
