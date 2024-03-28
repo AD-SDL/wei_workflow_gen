@@ -69,15 +69,14 @@ class Agent:
 
 
 
-class OrchestrationAgent(Agent):
-    def __init__(self, model, config):
-        super().__init__("orchestration", model, config, INITIAL_ORCHESTRATION_PROMPT)
+class OrchestratorAgent(Agent):
+    def __init__(self, config):
+        super().__init__("orchestration", config, INITIAL_ORCHESTRATION_PROMPT)
 
 class CodeAgent(Agent):
-    def __init__(self, model, config):
-        super().__init__("code", model, config, INITIAL_CODE_PROMPT)
-
+    def __init__(self, config):
+        super().__init__("code", config, INITIAL_CODE_PROMPT)
 
 class ValidatorAgent(Agent):
-    def __init__(self, model, config):
-        super().__init__("validator", model, config, INITIAL_VALIDATOR_PROMPT)
+    def __init__(self, config):
+        super().__init__("validator", config, INITIAL_VALIDATOR_PROMPT)
