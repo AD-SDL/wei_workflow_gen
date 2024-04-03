@@ -1,16 +1,18 @@
-from wrapper import *
+from .wrapper import *
+
 # from prompts import seller_gen
 # from prompts import buyer_gen
 from copy import deepcopy
 from openai import OpenAI
 
 from typing import Any, Dict, List, Union
-from prompts import INITIAL_ORCHESTRATION_PROMPT, INITIAL_CODE_PROMPT, INITIAL_VALIDATOR_PROMPT
+from .prompts import INITIAL_ORCHESTRATION_PROMPT, INITIAL_CODE_PROMPT, INITIAL_VALIDATOR_PROMPT
+
 
 class Agent:
-    def __init__(self, agent_type: str, model: str, config: Any, initial_prompt: List[Dict[str, str]]) -> None:
+    def __init__(self, agent_type: str, model:str, config: Any, initial_prompt: List[Dict[str, str]]) -> None:
         self.agent_type: str = agent_type
-        self.model: str = model  # The model name
+        self.model: str = model # The model name
         self.initial_dialog_history: List[Dict[str, str]] = deepcopy(initial_prompt)
         self.config: Dict[str, Any] = config
         self.dialog_history: List[Dict[str, str]] = [] if not initial_prompt else deepcopy(initial_prompt)
@@ -20,8 +22,10 @@ class Agent:
     def _initialize_engine(self) -> None:
         print(f"Initializing {self.agent_type} engine {self.model}")
         if "gpt" in self.model:
-            self.engine = OpenAI(api_key=self.config["api_keys"]["openai"]["key"],
-                                 organization=self.config["api_keys"]["openai"]["org"])
+            self.engine = OpenAI(
+                api_key=self.config["api_keys"]["openai"]["key"],
+                organization=self.config["api_keys"]["openai"]["org"],
+            )
         else:
             raise ValueError(f"Unknown model {self.model}")
 
@@ -36,9 +40,15 @@ class Agent:
 
     def call_engine(self, messages: List[Dict[str, str]], raw: bool = False) -> Any:
         model_router = {
-            "gpt-3.5-turbo": lambda: openai_completion_with_backoff(engine=self.engine, model=self.model, messages=messages),
-            "gpt-3.5-turbo-0125": lambda: openai_completion_with_backoff(engine=self.engine, model=self.model, messages=messages),
-            "gpt-4": lambda: openai_completion_with_backoff(engine=self.engine, model=self.model, messages=messages),
+            "gpt-3.5-turbo": lambda: openai_completion_with_backoff(
+                engine=self.engine, model=self.model, messages=messages
+            ),
+            "gpt-3.5-turbo-0125": lambda: openai_completion_with_backoff(
+                engine=self.engine, model=self.model, messages=messages
+            ),
+            "gpt-4": lambda: openai_completion_with_backoff(
+                engine=self.engine, model=self.model, messages=messages
+            ),
         }
         if self.model in model_router:
             response = model_router[self.model]()
@@ -52,7 +62,7 @@ class Agent:
         if prompt:
             prompt_entry = {"role": "user", "content": prompt}
             self.dialog_history.append(prompt_entry)
-        
+
         messages = list(self.dialog_history)
         message = self.call_engine(messages)
         store = {"role": "assistant", "content": message}
@@ -60,23 +70,26 @@ class Agent:
         return message
 
     def last_response(self) -> str:
-        return self.dialog_history[-1]['content']
+        return self.dialog_history[-1]["content"]
 
     def add_advice(self, content: str) -> None:
         new_message = {"role": "system", "content": content}
         self.dialog_history.append(new_message)
 
 
-
-
 class OrchestratorAgent(Agent):
-    def __init__(self, config):
-        super().__init__("orchestration", config, INITIAL_ORCHESTRATION_PROMPT)
+    def __init__(self, model, config, agent_context=None):
+        if agent_context:
+            super().__init__("orchestration", model, config, agent_context)
+        else:
+            super().__init__("orchestration", model, config, INITIAL_ORCHESTRATION_PROMPT)
+
 
 class CodeAgent(Agent):
-    def __init__(self, config):
-        super().__init__("code", config, INITIAL_CODE_PROMPT)
+    def __init__(self, model, config):
+        super().__init__("code", model, config, INITIAL_CODE_PROMPT)
+
 
 class ValidatorAgent(Agent):
-    def __init__(self, config):
-        super().__init__("validator", config, INITIAL_VALIDATOR_PROMPT)
+    def __init__(self, model, config):
+        super().__init__("validator", model, config, INITIAL_VALIDATOR_PROMPT)
