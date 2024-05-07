@@ -1,0 +1,18 @@
+metadata:
+  name: PCR - Workflow
+  author: <INSERT AUTHOR>
+  info: Initial PCR workflow for RPL workcell
+  version: 0.1
+
+workcell: /home/rpl/workspace/rpl_workcell/pcr_workcell/pcr_workcell.yaml
+
+modules:
+  - name: hidex
+
+flowdef:
+  - name: hidex_open
+    module: hidex
+    command: open
+    args:
+      foo: 1
+

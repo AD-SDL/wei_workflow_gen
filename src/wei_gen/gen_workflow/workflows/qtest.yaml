@@ -1,0 +1,21 @@
+metadata:
+  name: Color Picker - New Plate - Workflow
+  author: <INSERT AUTHOR>
+  info: New Plate workflow for the RPL Color Picker
+  version: 0.1
+
+workcell: /home/rpl/workspace/rpl_workcell/pcr_workcell/pcr_workcell.yaml
+
+modules:
+  - name: pf400
+  - name: sciclops
+
+flowdef:
+  - name: Move to final location
+    module: pf400
+    command: transfer
+    args:
+      source: sciclops.positions.exchange
+      target: camera_module.positions.plate_station
+      source_plate_rotation: narrow
+      target_plate_rotation: narrow

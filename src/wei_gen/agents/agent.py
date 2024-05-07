@@ -1,17 +1,17 @@
 from .wrapper import *
-
-# from prompts import seller_gen
-# from prompts import buyer_gen
 from copy import deepcopy
 from openai import OpenAI
-
+import os
+import json
 from typing import Any, Dict, List, Union
-from .prompts import INITIAL_ORCHESTRATION_PROMPT, INITIAL_CODE_PROMPT, INITIAL_VALIDATOR_PROMPT
+from .prompts import INITIAL_ORCHESTRATION_PROMPT, INITIAL_CODE_PROMPT, INITIAL_VALIDATOR_PROMPT, INITIAL_WORKFLOW_PROMPT
+from gen_workflow.db import DB
 
 
 class Agent:
     def __init__(self, agent_type: str, model:str, config: Any, initial_prompt: List[Dict[str, str]]) -> None:
         self.agent_type: str = agent_type
+        self.instrument_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "../instruments.json")
         self.model: str = model # The model name
         self.initial_dialog_history: List[Dict[str, str]] = deepcopy(initial_prompt)
         self.config: Dict[str, Any] = config
@@ -76,7 +76,12 @@ class Agent:
         new_message = {"role": "system", "content": content}
         self.dialog_history.append(new_message)
 
-
+    def get_history(self) -> List[Dict[str, str]]:
+        return self.dialog_history[1:] # Return everything but system prompt
+    
+    def set_history(self, history: List[Dict[str, str]]) -> None:
+        self.dialog_history.extend(history)
+        
 class OrchestratorAgent(Agent):
     def __init__(self, model, config, agent_context=None):
         if agent_context:
@@ -84,10 +89,25 @@ class OrchestratorAgent(Agent):
         else:
             super().__init__("orchestration", model, config, INITIAL_ORCHESTRATION_PROMPT)
 
-
 class CodeAgent(Agent):
     def __init__(self, model, config):
         super().__init__("code", model, config, INITIAL_CODE_PROMPT)
+
+
+class WorkflowAgent(Agent):
+    def __init__(self, model, config):
+        super().__init__("workflow", model, config, INITIAL_WORKFLOW_PROMPT)
+        self.db = DB()
+        print("Loading instruments", self.instrument_path)
+        with open(self.instrument_path, "r") as f:
+            self.all_instruments = json.load(f)
+        
+    def gen_workflow(self, user_input: str) -> str:
+        example_workflows = self.db.query(user_input)
+        all_instruments_str = json.dumps(self.all_instruments)
+        prompt = f"Create a yaml workflow for the following experiment plan. {user_input} ##### The following is list of all instruments at your disposal {all_instruments_str}, YOU MUST ONLY USE THESE INSTRUMENTS ##### Here are examples of similar workflows \n{example_workflows}\n, you must follow this format"
+        response = self.call(prompt)
+        return response
 
 
 class ValidatorAgent(Agent):

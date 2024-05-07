@@ -160,3 +160,7 @@ cython_debug/
 #.idea/
 
 config.yaml
+
+# Chromadb
+
+# src/wei_gen/workflow_gen

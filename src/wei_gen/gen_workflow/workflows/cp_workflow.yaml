@@ -1,0 +1,21 @@
+metadata:
+  name: ColorPickles
+  author: <INSERT AUTHOR>
+  info: ColorPicker workflow for RPL workcell
+  version: 0.1
+
+workcell: /home/rpl/workspace/rpl_workcell/pcr_workcell/pcr_workcell.yaml
+
+modules:
+  - name: ot2_cp_gamma
+  - name: pf400
+  - name: sciclops
+  - name: camera
+
+flowdef:
+  - name: Mix  Colors
+    module: ot2_cp_gamma
+    command: run_protocol
+    args:
+      config_path: /home/rpl/wei_ws/demo/rpl_workcell/color_picker/protocol_files/red_protocol.yaml
+    comment: Mix the red portions according to input data
