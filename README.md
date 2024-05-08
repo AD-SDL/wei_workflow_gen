@@ -10,8 +10,7 @@ wei_gen is a python package that takes a natural language description of an expe
 0. <u>Generate code</u>: Using previous messages as context, create python code logic for the entire experiment. Using an [AgentCoder](https://arxiv.org/abs/2312.13010v2) inspired scheme. 
     1. Generate code: In the future, this step should also use RAG to get similar code snippet examples.
     2. Validate code (TBD): <br/>[Option 1]: Save the generated code into a file that can be used to validate the logic of both the workflow and the code together. Then logs from the can be used to iterate on this process, or trigger a modification of the workflow.<br/>
-    [Option 2]: Create mocks for the functions on the workflow. No need for AI in this step, just standard code gen. If the first option is not plausible, this is what we should do.<br/>
-    [Option 3]: Combination of both. First run option 2 to see if logic is sound, then run option 1 to further validate the workflow.
+    [Option 2]: Create mocks for the functions on the workflow. No need for AI in this step, just standard code gen. If the first option is not plausible, this is what we should do.<br/>[Option 3]: Combination of both. First run option 2 to see if logic is sound, then run option 1 to further validate the workflow.
 0. <u>Generate misc</u>: Using the previous information as context, generate any extra documents (init locations of pipets, etc.). This step will surely need RAG, and it will be beneficial to create some sort of database of examples. This kind of information could also be put in the module abouts (explanations about the initial setup of the module)
 
 ## Workflow Gen
@@ -80,11 +79,12 @@ wei_gen will only be as good as the data it is provided.
 To run any tests, check out the scripts in [/scripts](src/scripts/) that have various examples of testing the different functions accessible on the wei_gen session.
 
 The weigen session class has the following functions that can be called on it
-- `gen_orchestration(self, user_input: str) -> str`
+- `gen_experiment_framework(self, user_input: str) -> str`
 - `gen_code(self, content: str) -> None`
 - `gen_workflow(self, user_input = "") -> None`
-- `complete_code(self) -> None`
+- `gen_extra_configs(self) -> None`
 - `get_history -> json`
+
 
 
 ### Example usage
