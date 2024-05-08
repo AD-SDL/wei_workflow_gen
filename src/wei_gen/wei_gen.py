@@ -37,6 +37,8 @@ class History:
             self.status = loaded_data["status"]
             self.session_id = loaded_data["session_id"]
 
+        # You will need to modify assistant responses as iterations continue.
+
     def load_history(self) -> Dict[str, Any]:
         """
         Load history from a JSON file
@@ -91,7 +93,7 @@ class Session:
         Initialize the session
         """
         self.history = History(config["version"], session_id)
-        self.version: str = config["version"]
+        self.version: str = "0.0.1" # TODO LOAD THIS FROM SOME OTHER PLACE (toml)
         self.start_time: float = time.time()
         settings: Dict[str, Any] = config["settings"]
         self.orchestrator: OrchestratorAgent = OrchestratorAgent(settings["orchestrator_model"], config)
@@ -100,8 +102,7 @@ class Session:
         if session_id:
             self.orchestrator = OrchestratorAgent(settings["orchestrator_model"], config, self.history.agent_context)
         
-        self.coder: CodeAgent = CodeAgent(settings["code_model"], config)
-        self.validator: ValidatorAgent = ValidatorAgent(settings["validator_model"], config)
+        
         self.workflow: WorkflowAgent = WorkflowAgent(settings["workflow_model"], config)
 
     def gen_orchestration(self, user_input: str) -> str:

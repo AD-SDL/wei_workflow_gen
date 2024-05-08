@@ -11,13 +11,18 @@ from gen_workflow.db import DB
 class Agent:
     def __init__(self, agent_type: str, model:str, config: Any, initial_prompt: List[Dict[str, str]]) -> None:
         self.agent_type: str = agent_type
-        self.instrument_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "../instruments.json")
         self.model: str = model # The model name
         self.initial_dialog_history: List[Dict[str, str]] = deepcopy(initial_prompt)
         self.config: Dict[str, Any] = config
         self.dialog_history: List[Dict[str, str]] = [] if not initial_prompt else deepcopy(initial_prompt)
         self.engine: Any = None
         self._initialize_engine()
+
+        instrument_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "../instruments.json")
+        with open(instrument_path, "r") as f:
+            self.all_instruments = json.load(f)
+
+        self.all_instruments_str = json.dumps(self.all_instruments)
 
     def _initialize_engine(self) -> None:
         print(f"Initializing {self.agent_type} engine {self.model}")
@@ -47,6 +52,9 @@ class Agent:
                 engine=self.engine, model=self.model, messages=messages
             ),
             "gpt-4": lambda: openai_completion_with_backoff(
+                engine=self.engine, model=self.model, messages=messages
+            ),
+            "gpt-4-turbo": lambda: openai_completion_with_backoff(
                 engine=self.engine, model=self.model, messages=messages
             ),
         }
@@ -93,19 +101,32 @@ class CodeAgent(Agent):
     def __init__(self, model, config):
         super().__init__("code", model, config, INITIAL_CODE_PROMPT)
 
+    def generate_code(self, user_input: str, workflow: str) -> str:
+        prompt = f"Create a yaml workflow for the following experiment plan. {user_input} ##### The following is list of all instruments at your disposal {self.all_instruments_str}, YOU MUST ONLY USE THESE INSTRUMENTS ##### Here are examples of similar workflows \n{example_workflows}\n, you must follow this format"
+        response = self.call(user_input)
+        return response
+
 
 class WorkflowAgent(Agent):
     def __init__(self, model, config):
         super().__init__("workflow", model, config, INITIAL_WORKFLOW_PROMPT)
         self.db = DB()
-        print("Loading instruments", self.instrument_path)
-        with open(self.instrument_path, "r") as f:
-            self.all_instruments = json.load(f)
         
+    def determine_instruments(self, user_input: str) -> str:
+        instruments = self.db.query(user_input)
+        prompt = f"Based on the following experiment plan, {user_input}, which instruments would you use? The following is list of all instruments at your disposal {self.all_instruments_str}, YOU MUST ONLY USE THESE INSTRUMENTS ##### Here are examples of similar workflows \n{instruments}\n, you must follow this format"
+        response = self.call(prompt)
+        return response
+    
+    def determine_number_of_workflows(self, user_input: str) -> str:
+        number_of_workflows = self.db.query(user_input)
+        prompt = f"Based on the following experiment plan, {user_input}, how many workflows would you generate? The following is list of all instruments at your disposal {self.all_instruments_str}, YOU MUST ONLY USE THESE INSTRUMENTS ##### Here are examples of similar workflows \n{number_of_workflows}\n, you must follow this format"
+        response = self.call(prompt)
+        return response
+    
     def gen_workflow(self, user_input: str) -> str:
         example_workflows = self.db.query(user_input)
-        all_instruments_str = json.dumps(self.all_instruments)
-        prompt = f"Create a yaml workflow for the following experiment plan. {user_input} ##### The following is list of all instruments at your disposal {all_instruments_str}, YOU MUST ONLY USE THESE INSTRUMENTS ##### Here are examples of similar workflows \n{example_workflows}\n, you must follow this format"
+        prompt = f"Create a yaml workflow for the following experiment plan. {user_input} ##### The following is list of all instruments at your disposal {self.all_instruments_str}, YOU MUST ONLY USE THESE INSTRUMENTS ##### Here are examples of similar workflows \n{example_workflows}\n, you must follow this format"
         response = self.call(prompt)
         return response
 
