@@ -93,7 +93,7 @@ class Session:
         Initialize the session
         """
         self.history = History(config["version"], session_id)
-        self.version: str = "0.0.1" # TODO LOAD THIS FROM SOME OTHER PLACE (toml)
+        self.version: str = "0.0.1" # TODO load from toml or similar
         self.start_time: float = time.time()
         settings: Dict[str, Any] = config["settings"]
         self.orchestrator: OrchestratorAgent = OrchestratorAgent(settings["orchestrator_model"], config)
@@ -105,19 +105,18 @@ class Session:
         
         self.workflow: WorkflowAgent = WorkflowAgent(settings["workflow_model"], config)
 
-    def gen_orchestration(self, user_input: str) -> str:
+    def gen_experiment_framework(self, user_input: str) -> str:
         """
         Orchestrate the experiment plan.
         """
-        response: str = self.orchestrator.call(user_input)
-        self.history.add_history("orchestrator", "orchestration", response, self.orchestrator.dialog_history)
-        return response
-    
-    def complete_orchestration(self) -> None:
-        """
-        Mark the orchestration step as complete for the session
-        """
-        self.history.status["orchestration"] = True
+        # first, validate experiment
+        validity = self.orchestrator.validate_experiment(user_input)
+        if validity < 0.5: 
+            # TODO, allow iteration on this step, provide feedback to user why this experiment was not valid.
+            raise Exception(f"Experiment is not valid. Validator returned a validity score < 0.5 ({validity}). Check modules available and try again.")
+        experiment_framework = self.orchestrator.gen_experiment_framework(user_input)
+        self.history.add_history("orchestrator", "orchestration", experiment_framework, self.orchestrator.ctx)
+        return experiment_framework
 
     def gen_code(self, content: str) -> None:
         """
@@ -132,7 +131,7 @@ class Session:
         Generate workflow yaml.
         """
         response: str = self.workflow.gen_workflow(user_input)
-        self.history.add_history("workflow", "gen_workflow", response, self.workflow.dialog_history)
+        self.history.add_history("workflow", "gen_workflow", response, self.workflow.ctx)
         return response
 
 
