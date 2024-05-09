@@ -1,0 +1,22 @@
+metadata:
+  name: example workflow
+  author: <INSERT AUTHOR>
+  info: extended info
+  version: 0.1
+
+workcell: ../pcr_workcell.yaml
+
+modules:
+  - name: pf400
+
+flowdef:
+  - name: Move from Sciclops to OT2
+    module: pf400
+    command: transfer
+    args:
+      source: sciclops.positions.exchange
+      target: ot2_pcr_alpha.positions.deck2
+      source_plate_rotation: narrow
+      target_plate_rotation: wide
+    checks: null
+    comment: Place plate in ot2
