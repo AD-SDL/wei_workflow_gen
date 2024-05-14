@@ -2,16 +2,17 @@ import os
 import yaml
 import chromadb
 import json
-class DB:
+class RAG:
     def __init__(self, directory_path='workflows'):
         root_path = os.path.dirname(os.path.abspath(__file__))
+        self.directory_path = directory_path
         self.client = chromadb.EphemeralClient()
         try:
-            self.client.get_collection("workflow-collection")
-            self.client.delete_collection("workflow-collection")
+            self.client.get_collection(f"{directory_path}-collection")
+            self.client.delete_collection(f"{directory_path}-collection")
         except:
             print("Creating collection")
-        self.collection = self.client.create_collection("workflow-collection")
+        self.collection = self.client.create_collection(f"{directory_path}-collection")
         workflows_dir = os.path.join(root_path, directory_path)
         self._load_workflows(workflows_dir)
 
@@ -21,7 +22,10 @@ class DB:
                 file_path = os.path.join(workflows_dir, filename)
                 with open(file_path, 'r') as file:
                     workflow_yaml = yaml.safe_load(file)
-                    info = workflow_yaml.get('metadata').get('info')
+                    if self.directory_path == 'workflows':
+                        info = workflow_yaml.get('metadata').get('info')
+                    else:
+                        info = filename
                     document_string = yaml.dump(workflow_yaml, sort_keys=False)
                     self.collection.add(
                         documents=[document_string],

@@ -5,7 +5,7 @@ from agents.agent import OrchestratorAgent, CodeAgent, ValidatorAgent, WorkflowA
 import uuid
 import os
 from typing import Optional, Dict, List, Any
-from gen_workflow.db import DB
+from wei_gen.rag.interface import RAG
 class History:
     def __init__(self, version: str, session_id: Optional[str] = None):
         """
@@ -26,7 +26,7 @@ class History:
         # Define the path to the JSON file
         self.history_file_path: str = f"{base_dir}/history/{self.session_id}_history.json"
         
-        self.db = DB()
+        self.db = RAG()
         if session_id:
             # If there's a session_id, try to load the existing history
             loaded_data: Dict[str, Any] = self.load_history()
@@ -92,7 +92,7 @@ class Session:
         """
         Initialize the session
         """
-        self.history = History(config["version"], session_id)
+        self.history = History("0.0.1", session_id)
         self.version: str = "0.0.1" # TODO load from toml or similar
         self.start_time: float = time.time()
         settings: Dict[str, Any] = config["settings"]
