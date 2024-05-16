@@ -1,91 +1,8 @@
-import time
 import yaml
-import json
-from agents.agent import OrchestratorAgent, CodeAgent, ValidatorAgent, WorkflowAgent
-import uuid
-import os
-from typing import Optional, Dict, List, Any
-from wei_gen.rag.interface import RAG
-class History:
-    def __init__(self, version: str, session_id: Optional[str] = None):
-        """
-        Initialize the history of the session
-        """
-        self.history: List[Dict[str, Any]] = []
-        self.agent_context: List[Any] = []
-        self.text_context: str = ""
-        self.version: str = version
-        self.orchestration: str = ""
-        self.status: Dict[str, bool] = {
-            "orchestration": False,
-            "code": False,
-        }
-        self.session_id: str = session_id if session_id else str(uuid.uuid4())
-        base_dir: str = os.path.dirname(os.path.abspath(__file__))
-
-        # Define the path to the JSON file
-        self.history_file_path: str = f"{base_dir}/history/{self.session_id}_history.json"
-        
-        self.db = RAG()
-        if session_id:
-            # If there's a session_id, try to load the existing history
-            loaded_data: Dict[str, Any] = self.load_history()
-            self.history = loaded_data["history"]
-            self.agent_context = loaded_data["agent_context"]
-            self.text_context = loaded_data["text_context"]
-            self.orchestration = loaded_data["orchestration"]
-            self.status = loaded_data["status"]
-            self.session_id = loaded_data["session_id"]
-
-        # You will need to modify assistant responses as iterations continue.
-
-    def load_history(self) -> Dict[str, Any]:
-        """
-        Load history from a JSON file
-        """
-        try:
-            with open(self.history_file_path, 'r') as file:
-                return json.load(file)
-        except FileNotFoundError:
-            print("Error: File not found.")
-            return {}
-
-    def save_history(self) -> None:
-        """
-        Save the current history to a JSON file
-        """
-        with open(self.history_file_path, 'w') as file:
-            entry: Dict[str, Any] = {
-                "version": self.version,
-                "history": self.history,
-                "agent_context": self.agent_context,
-                "text_context": self.text_context,
-                "orchestration": self.orchestration,
-                "status": self.status,
-                "session_id": self.session_id,
-            }
-            json.dump(entry, file, indent=4)
-
-    def add_history(self, agent_type: str, phase: str, content: str, agent_context: List[Any]) -> None:
-        """
-        Add a new entry to the session
-        """
-        new_history: Dict[str, Any] = {
-            "agent_type": agent_type,
-            "phase": phase,
-            "content": content,
-            "timestamp": time.time(),
-            "index": len(self.history),
-        }
-        self.history.append(new_history)
-        self.agent_context = agent_context
-        if "#####" in content:
-            self.orchestration = content.split("#####")[1]
-        if len(self.text_context) > 0:
-            self.text_context += "\n"
-        self.text_context += f"{agent_type}: {content}"
-        self.save_history()
-        print(f"HISTORY: {self.history}\nAGENT: {self.agent_context}\nTEXT: {self.text_context}\nORCHESTRATION: {self.orchestration}")
+from agents.agent import FrameworkAgent
+from gen.gen_env import WorkflowGen, ConfigGen, CodeGen
+from history.interface import History
+from typing import Optional, Dict, Any
 
 class Session:
     def __init__(self, config: Dict[str, Any], session_id: Optional[str] = None):
@@ -94,52 +11,71 @@ class Session:
         """
         self.history = History("0.0.1", session_id)
         self.version: str = "0.0.1" # TODO load from toml or similar
-        self.start_time: float = time.time()
-        settings: Dict[str, Any] = config["settings"]
-        self.orchestrator: OrchestratorAgent = OrchestratorAgent(settings["orchestrator_model"], config)
+
+        self.framework: FrameworkAgent = FrameworkAgent(config)
         
         # load with history if session_id is provided
         if session_id:
-            self.orchestrator = OrchestratorAgent(settings["orchestrator_model"], config, self.history.agent_context)
+            self.framework = FrameworkAgent(config, self.history.agent_context)
+                
+        self.workflow_gen_env: WorkflowGen = WorkflowGen(config,)
+        self.config_gen_env: ConfigGen = ConfigGen(config)
+        self.code_gen_env: CodeGen = CodeGen(config)
+        self.validation_threshold: float = config["settings"]["validation_threshold"]
+
+    def execute_experiment(self, user_input: str) -> None:
+        """
+        Execute the experiment
+        """
+        self.history.set_original_user_input(user_input)
+        prob = self.framework.validate_experiment(user_input)
+        if prob < self.validation_threshold:
+            raise Exception(f"Experiment is not valid. Validator returned a probability < {self.validation_threshold} ({prob}). Check modules available and try again.")
+        self.history.set_validation_status(True)
+
+        experiment_framework = self.gen_experiment_framework(user_input)
+        self.history.add_agent_history("framework", self.framework.ctx, experiment_framework)
+
+        workflow = self.workflow_gen_env.generate_code(experiment_framework)
+        self.history.add_agent_history("workflow", self.workflow_gen_env.ctx, workflow)
+
+
+        code = self.code_gen_env.generate_code(experiment_framework, workflow)
+        self.history.add_agent_history("code", self.code_gen_env.ctx, code)
+
+        config = self.config_gen_env.generate_code(experiment_framework)
+        self.history.add_agent_history("config", self.config_gen_env.ctx, config)
+
+        print("Experiment completed successfully.")
+
+    def call_gen_env(self, agent: str, user_input: str) -> str:
+        """
+        Call the generator environment
+        """
+        if agent == "framework":
+            resp = self.framework_gen_env.call(user_input)
+            self.history.add_agent_history("framework", self.framework_gen_env.ctx, resp)
+            return resp
+        elif agent == "workflow":
+            resp = self.workflow_gen_env.call_coder(user_input)
+            self.history.add_agent_history("workflow", self.workflow_gen_env.ctx, resp)
+            return resp
+        elif agent == "config":
+            resp = self.config_gen_env.call_coder(user_input)
+            self.history.add_agent_history("config", self.config_gen_env.ctx, resp)
+            return resp
+        elif agent == "code":
+            resp = self.code_gen_env.call_coder(user_input)
+            self.history.add_agent_history("code", self.code_gen_env.ctx,resp)
+            return resp
+        else:
+            pass # TODO raise exception
         
-        
-        self.workflow: WorkflowAgent = WorkflowAgent(settings["workflow_model"], config)
-
-    def gen_experiment_framework(self, user_input: str) -> str:
+    def modify_generated_data(self, agent: str, user_input: str) -> None:
         """
-        Orchestrate the experiment plan.
+        Modify the generated data
         """
-        # first, validate experiment
-        validity = self.orchestrator.validate_experiment(user_input)
-        if validity < 0.5: 
-            # TODO, allow iteration on this step, provide feedback to user why this experiment was not valid.
-            raise Exception(f"Experiment is not valid. Validator returned a validity score < 0.5 ({validity}). Check modules available and try again.")
-        experiment_framework = self.orchestrator.gen_experiment_framework(user_input)
-        self.history.add_history("orchestrator", "orchestration", experiment_framework, self.orchestrator.ctx)
-        return experiment_framework
-
-    def gen_code(self, content: str) -> None:
-        """
-        Generate code (for the app, YAMLs, etc.)
-        """
-        # TODO - kick off the code generation loop
-        # TODO - to start just do code gen without validation
-        pass
-
-    def gen_workflow(self, user_input = "") -> None:
-        """
-        Generate workflow yaml.
-        """
-        response: str = self.workflow.gen_workflow(user_input)
-        self.history.add_history("workflow", "gen_workflow", response, self.workflow.ctx)
-        return response
-
-
-    def complete_code(self) -> None:
-        """
-        Mark the code generation step as complete for the session
-        """
-        self.history.status["code"] = True
+        self.history.update_generated_content(agent, user_input)
 
 class WEIGen:
     def __init__(self, config_path: str):

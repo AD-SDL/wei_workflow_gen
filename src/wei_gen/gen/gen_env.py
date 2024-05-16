@@ -1,7 +1,7 @@
 import subprocess
 import os
 from openai import OpenAI
-from wei_gen.agents.agent import CodeAgent, ValidatorAgent, WorkflowAgent
+from wei_gen.agents.agent import CodeAgent, ValidatorAgent, WorkflowAgent, ConfigAgent
 from typing import Tuple
 class GenEnv:
     def __init__(self, config, coder, validator):
@@ -48,6 +48,15 @@ class WorkflowGen(GenEnv):
             is_valid, err = self._is_workflow_valid()
             attempts += 1
         return self.code
+class ConfigGen(GenEnv):
+    def __init__(self, config, instrument):
+        coder: ConfigAgent = ConfigAgent(config, instrument)
+        super().__init__(config, coder, None)
+
+    def generate_code(self, experiment_framework):
+        self.code = self.coder.gen_instrument_config(experiment_framework)
+        return self.code
+
 
 class CodeGen(GenEnv):
     def __init__(self, config):
@@ -60,6 +69,9 @@ class CodeGen(GenEnv):
         print("Full response from code generation:", full_resp)
         self.code = self.coder.get_code()
         return self.code
+    
+
+
 
         # TODO, create mocks of some sort to test logic of generated python code.
         # self.test_code = self.validator.generate_tests(description, self.code)

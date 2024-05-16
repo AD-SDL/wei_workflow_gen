@@ -1,7 +1,7 @@
 import unittest
 from .interface import RAG 
 
-class TestTAGFunctionality(unittest.TestCase):
+class TestRAG(unittest.TestCase):
     def setUp(self):
         # Setup the test environment
         self.workflow_rag = RAG()

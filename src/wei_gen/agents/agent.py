@@ -12,7 +12,8 @@ from wei_gen.rag.interface import RAG
 class Agent:
     def __init__(self, agent_type: str, config: Any, initial_prompt: List[Dict[str, str]]) -> None:
         self.agent_type: str = agent_type
-        self.model: str = config["settings"][f"{agent_type}_model"] if "instrument" not in agent_type else config["settings"]["instrument_model"]
+        print("ASHAKJSH",config["settings"][f"{agent_type}_model"] if "config" not in agent_type else config["settings"]["config_model"])
+        self.model: str = config["settings"][f"{agent_type}_model"] if "config" not in agent_type else config["settings"]["config_model"]
         self.initial_ctx: List[Dict[str, str]] = deepcopy(initial_prompt)
         self.config: Dict[str, Any] = config
         self.ctx: List[Dict[str, str]] = [] if not initial_prompt else deepcopy(initial_prompt)
@@ -109,12 +110,12 @@ class Agent:
         # Convert log probability to actual 0 - 1 probability using np.exp
         return np.exp(p_target)
     
-class OrchestratorAgent(Agent):
+class FrameworkAgent(Agent):
     def __init__(self, config, agent_context=None):
         if agent_context:
-            super().__init__("orchestrator", config, agent_context)
+            super().__init__("framework", config, agent_context)
         else:
-            super().__init__("orchestrator", config, INITIAL_ORCHESTRATION_PROMPT)
+            super().__init__("framework", config, INITIAL_ORCHESTRATION_PROMPT)
     
     def validate_experiment(self, user_input: str) -> str:
         """
@@ -125,7 +126,7 @@ class OrchestratorAgent(Agent):
         return self.parse_logprobs(resp)
     
     def gen_experiment_framework(self, user_input: str) -> str:
-        prompt = f"Create a step by step plan . {user_input} ##### The following is list of all instruments at your disposal {self.all_instruments_str}, YOU MUST ONLY USE THESE INSTRUMENTS ##### Here are examples of similar workflows \n{example_workflows}\n, you must follow this format"
+        prompt = f"Create a step by step plan of the following experiment {user_input} ##### The following is list of all instruments at your disposal {self.all_instruments_str}, YOU MUST ONLY USE THESE INSTRUMENTS"
         return self.call(prompt)
 
 class CodeAgent(Agent):
@@ -182,9 +183,9 @@ class WorkflowAgent(Agent):
 
 
 
-class InstrumentAgent(Agent):
+class ConfigAgent(Agent):
     def __init__(self, config, instrument): #OT2 Liquidhandling robot
-        super().__init__(f"instrument-{instrument}", config, INITIAL_INSTRUMENT_PROMPT)
+        super().__init__(f"config_{instrument}", config, INITIAL_INSTRUMENT_PROMPT)
         self.rag = RAG(instrument)
         self.instrument = instrument
 
@@ -194,3 +195,19 @@ class InstrumentAgent(Agent):
         extra_context = f"Use the following values {extra_context} as context for desired values in the config. " if extra_context else ""
         prompt = f"You are creating a yaml config for the {self.instrument} instrument which will be used in the following experiment {experiment_framework}. {extra_context}Use the following {n_results} examples to construct your config\n{example_configs}\n #### IMPORTANT: You must respond exclusively with ONLY A YAML FILE."
         return self.call(prompt)
+
+class AdviceAgent(Agent):
+    def __init__(self, config, aid_type):
+        super().__init__(f"aid-{aid_type}", config, [])
+        self.aid_type = aid_type
+
+    def provide_advice(self,history, user_input: str) -> str:
+        self.ctx = {
+            "role": "system",
+            "content": f"Here is some advice for you. {history}" # TODO import this
+        }
+        messages = list(self.ctx)
+        response = self.call_engine(messages)
+        store = {"role": "assistant", "content": response}
+        self.ctx.append(store)
+        return response

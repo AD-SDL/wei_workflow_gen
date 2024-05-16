@@ -26,25 +26,25 @@ An example a of a session history is below
 
 ```json
 {
-   "version": "0.0.1",
-   "session_id": "f8954ec2-b1b4-413e-b566-ed4fe641536d",
-   "timestamp": 0,
-   "framework_agent_ctx": [...],
-   "workflow_agent_ctx": [...],
-   "code_agent_ctx": [...],
-   "validator_agent_ctx": [...],
-   "final_framework": "",
-   "original_user_input": "",
-   "experiment_validity": 1,
-   "status": {
+    "version": "0.0.1",
+    "session_id": "f8954ec2-b1b4-413e-b566-ed4fe641536d",
+    "timestamp": 0,
+    "framework_agent_ctx": [],
+    "workflow_agent_ctx": [],
+    "code_agent_ctx": [],
+    "validator_agent_ctx": [],
+    "original_user_input": "",
+    "generated_framework": "",
+    "generated_code": "",
+    "generated_workflow": [],
+    "generated_config": [],
+    "status": {
         "validation": false,
         "framework": false,
         "workflow": false,
         "code": false,
-        "extras": false,
+        "config": false,
     },
-    "output_workflows": [],
-    "output_code": "",
 }
 ```
 
@@ -102,7 +102,7 @@ api_keys:
     key: "sk-..."
     org: "org-..."
 settings:
-  orchestrator_model: "gpt-4-turbo"
+  framework_model: "gpt-4-turbo"
   code_model: "gpt-4-turbo"
   validator_model: "gpt-4-turbo"
   workflow_model: "gpt-4-turbo"

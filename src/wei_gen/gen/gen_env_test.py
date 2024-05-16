@@ -1,7 +1,7 @@
 import unittest
-from .gen_env import WorkflowGen, CodeGen
+from .gen_env import WorkflowGen, CodeGen, ConfigGen
 
-class TestDBFunctionality(unittest.TestCase):
+class TestGenEnv(unittest.TestCase):
     def setUp(self):
         # Setup the test environment
         config = {
@@ -12,7 +12,7 @@ class TestDBFunctionality(unittest.TestCase):
                 }
             },
             "settings": {
-                "orchestrator_model": "gpt-4-turbo",
+                "framework_model": "gpt-4-turbo",
                 "code_model": "gpt-4-turbo",
                 "validator_model": "gpt-4-turbo",
                 "workflow_model": "gpt-4-turbo",
@@ -21,6 +21,7 @@ class TestDBFunctionality(unittest.TestCase):
         }
         self.workflow_gen = WorkflowGen(config)
         self.code_gen = CodeGen(config)
+        self.config_gen = ConfigGen(config, "ot2")
 
     def test_code_gen(self):
         # Test if PCR workflows are retrieved from a super basic query
@@ -28,6 +29,10 @@ class TestDBFunctionality(unittest.TestCase):
         print("Generated workflow:", workflow)
         results = self.code_gen.generate_code("PCR Experiment", workflow)
         print("Generated workflow code:", results)
+
+        # test config
+        config = self.config_gen.generate_code("PCR Experiment", )
+        print("Generated workflow code:", config,)
 
 
 if __name__ == '__main__':
