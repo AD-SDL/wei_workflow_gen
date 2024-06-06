@@ -16,7 +16,8 @@ class TestGenEnv(unittest.TestCase):
                 "code_model": "gpt-4-turbo",
                 "validator_model": "gpt-4-turbo",
                 "workflow_model": "gpt-4-turbo",
-                "critic_model": "gpt-4-turbo"
+                "critic_model": "gpt-4-turbo",
+                "config_model": "gpt-4-turbo"
             }
         }
         self.workflow_gen = WorkflowGen(config)

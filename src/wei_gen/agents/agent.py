@@ -6,19 +6,19 @@ import os
 import json
 from typing import Any, Dict, List, Union
 from .prompts import INITIAL_ORCHESTRATION_PROMPT, INITIAL_CODE_PROMPT, INITIAL_VALIDATOR_PROMPT, INITIAL_WORKFLOW_PROMPT, INITIAL_INSTRUMENT_PROMPT
-from wei_gen.rag.interface import RAG
+from rag.interface import RAG
 
 
 class Agent:
     def __init__(self, agent_type: str, config: Any, initial_prompt: List[Dict[str, str]]) -> None:
         self.agent_type: str = agent_type
-        print("ASHAKJSH",config["settings"][f"{agent_type}_model"] if "config" not in agent_type else config["settings"]["config_model"])
         self.model: str = config["settings"][f"{agent_type}_model"] if "config" not in agent_type else config["settings"]["config_model"]
         self.initial_ctx: List[Dict[str, str]] = deepcopy(initial_prompt)
         self.config: Dict[str, Any] = config
         self.ctx: List[Dict[str, str]] = [] if not initial_prompt else deepcopy(initial_prompt)
         self.engine: Any = None
         self._initialize_engine()
+        print(agent_type,self.ctx)
 
         instrument_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "../instruments.json")
         with open(instrument_path, "r") as f:
@@ -31,11 +31,10 @@ class Agent:
         if "gpt" in self.model:
             self.engine = OpenAI(
                 api_key=self.config["api_keys"]["openai"]["key"],
-                organization=self.config["api_keys"]["openai"]["org"],
             )
         else:
             raise ValueError(f"Unknown model {self.model}")
-
+    
     def reset(self) -> None:
         self.ctx = deepcopy(self.initial_ctx)
 
@@ -44,7 +43,9 @@ class Agent:
             return response.choices[0].message.content
         else:
             raise ValueError(f"Unknown engine {engine}")
-
+    def _get_context(self, initial_ctx, loaded_ctx):
+        return loaded_ctx if loaded_ctx else initial_ctx
+    
     def call_engine(self, messages: List[Dict[str, str]], raw: bool = False) -> Any:
         model_router = {
             "gpt-3.5-turbo": lambda: openai_completion_with_backoff(
@@ -98,40 +99,53 @@ class Agent:
         """
         history = deepcopy(self.ctx)
         history.append({"role": "user", "content": prompt})
-        return self.call_engine(list(history), raw).lower()
+        response = self.call_engine(history, raw)
+        return response
     
     def parse_logprobs(self, resp: Any, target_string: str = "YES") -> float:
         """
         Parse the logprobs to get the probability of the response being yes (or whatever string specified)
         """
         top_logprobs = resp.choices[0].logprobs.content[0].top_logprobs
-        p_target = sum(entry.logprob for entry in top_logprobs if entry.token.upper() == target_string)
-
+        p_target = 0
+        for entry in top_logprobs:
+            if entry.token.upper() == target_string:
+                p_target += np.exp(entry.logprob)
+        # p_target = sum(np.exp(entry.logprob) for entry in top_logprobs if entry.token.upper() == target_string)
         # Convert log probability to actual 0 - 1 probability using np.exp
-        return np.exp(p_target)
+        return p_target
     
 class FrameworkAgent(Agent):
-    def __init__(self, config, agent_context=None):
-        if agent_context:
-            super().__init__("framework", config, agent_context)
-        else:
-            super().__init__("framework", config, INITIAL_ORCHESTRATION_PROMPT)
+    def __init__(self, config, loaded_ctx=None):
+        super().__init__("framework", config, self._get_context(INITIAL_ORCHESTRATION_PROMPT, loaded_ctx))
+ 
     
-    def validate_experiment(self, user_input: str) -> str:
+    def validate_experiment(self, user_input: str):
         """
         Validate if the experiment can be carried out with the modules available from the /abouts
         """
-        prompt = f"Based on the following experiment plan, {user_input}, can you tools at your disposal actually carry out this experiment? The following is list of all tools at your disposal {self.all_instruments_str}, YOU MUST ONLY USE THESE INSTRUMENTS ##### IMPORTANT: You must ONLY respond in a YES or NO to this question."
+        base_prompt = f"Based on the following experiment proposition, {user_input}, can the instruments you have perform this experiment? The following is list of all tools at your disposal {self.all_instruments_str}, YOU CAN ONLY USE THESE INSTRUMENTS"
+        prompt = base_prompt + " ##### IMPORTANT: You must ONLY respond in a YES or NO to this question. Can you carry on with this experiment?"
         resp = self.transient_call(prompt, True)
-        return self.parse_logprobs(resp)
+        prob = self.parse_logprobs(resp)
+        if float(prob) < 0.001:
+            return False, self._explain_prev_response(base_prompt)
+        return True, prob
+    
+    def _explain_prev_response(self, prev_experiment) -> str:
+        """
+        Explain the previous response
+        """
+        prompt = f"{prev_experiment}\n##### The proposal above failed. Can you explain why?"
+        return self.transient_call(prompt)
     
     def gen_experiment_framework(self, user_input: str) -> str:
-        prompt = f"Create a step by step plan of the following experiment {user_input} ##### The following is list of all instruments at your disposal {self.all_instruments_str}, YOU MUST ONLY USE THESE INSTRUMENTS"
+        prompt = f"Create a step by step plan of the following experiment {user_input} ##### The following is list of all instruments at your disposal {self.all_instruments_str}, YOU MUST ONLY USE THESE INSTRUMENTS. Make sure to break down large objectives into a smaller, granular tasks. Your responses should always be clear and concise, your should ONLY respond with this step by step plan."
         return self.call(prompt)
 
 class CodeAgent(Agent):
-    def __init__(self, config):
-        super().__init__("code", config, INITIAL_CODE_PROMPT)
+    def __init__(self, config, loaded_ctx=None):
+        super().__init__("code", config, self._get_context(INITIAL_CODE_PROMPT, loaded_ctx) )
 
     def gen_code(self, experiment_framework: str, workflow: str) -> str:
         prompt = f"Create a python file for running this yaml workflow {workflow}. This is the experiment that this python code should run (using this workflow) {experiment_framework}"
@@ -143,12 +157,12 @@ class CodeAgent(Agent):
         return self.transient_call(prompt)
 
 class ValidatorAgent(Agent):
-    def __init__(self, config):
-        super().__init__("validator", config, INITIAL_VALIDATOR_PROMPT)
+    def __init__(self, config, loaded_ctx=None):
+        super().__init__("validator", config, self._get_context(INITIAL_VALIDATOR_PROMPT, loaded_ctx))
 
 class WorkflowAgent(Agent):
-    def __init__(self, config):
-        super().__init__("workflow", config, INITIAL_WORKFLOW_PROMPT)
+    def __init__(self, config, loaded_ctx=None):
+        super().__init__("workflow", config, self._get_context(INITIAL_WORKFLOW_PROMPT, loaded_ctx))
         self.rag = RAG()
 
     def _determine_instruments(self, experiment_framework: str) -> str:
@@ -184,20 +198,20 @@ class WorkflowAgent(Agent):
 
 
 class ConfigAgent(Agent):
-    def __init__(self, config, instrument): #OT2 Liquidhandling robot
-        super().__init__(f"config_{instrument}", config, INITIAL_INSTRUMENT_PROMPT)
+    def __init__(self, config, instrument, loaded_ctx=None): #OT2 Liquidhandling robot
+        super().__init__(f"config_{instrument}", config, self._get_context(INITIAL_INSTRUMENT_PROMPT, loaded_ctx))
         self.rag = RAG(instrument)
         self.instrument = instrument
 
-    def gen_instrument_config(self, experiment_framework, extra_context=None) -> str:
+    def gen_instrument_config(self, experiment_framework, user_values=None) -> str:
         n_results = 3
         example_configs = self.rag.query(experiment_framework, n_results=n_results)
-        extra_context = f"Use the following values {extra_context} as context for desired values in the config. " if extra_context else ""
+        extra_context = f"Use the following values {user_values} as context for desired values in the config. " if user_values else ""
         prompt = f"You are creating a yaml config for the {self.instrument} instrument which will be used in the following experiment {experiment_framework}. {extra_context}Use the following {n_results} examples to construct your config\n{example_configs}\n #### IMPORTANT: You must respond exclusively with ONLY A YAML FILE."
         return self.call(prompt)
 
 class AdviceAgent(Agent):
-    def __init__(self, config, aid_type):
+    def __init__(self, config, aid_type, loaded_ctx=None):
         super().__init__(f"aid-{aid_type}", config, [])
         self.aid_type = aid_type
 

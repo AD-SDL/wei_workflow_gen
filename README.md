@@ -191,3 +191,7 @@ See the current array of modules and their tags in [/src/wei_gen/instruments.jso
 
 
 
+
+## Notes
+ - the ui will parse code or yaml and use that to update generated data. 
+ - 

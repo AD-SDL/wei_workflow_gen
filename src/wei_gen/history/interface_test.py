@@ -19,19 +19,19 @@ class TestHistoryFunctionality(unittest.TestCase):
 
     def test_initialize_new_session(self):
         history = History(self.version)
-        self.assertEqual(history.history["version"], self.version)
-        self.assertIn("session_id", history.history)
-        self.assertIn("timestamp", history.history)
-        self.assertIn("framework_agent_ctx", history.history)
-        self.assertIn("workflow_agent_ctx", history.history)
-        self.assertIn("code_agent_ctx", history.history)
-        self.assertIn("validator_agent_ctx", history.history)
-        self.assertIn("original_user_input", history.history)
-        self.assertIn("generated_framework", history.history)
-        self.assertIn("generated_code", history.history)
-        self.assertIn("generated_workflow", history.history)
-        self.assertIn("generated_config", history.history)
-        self.assertIn("status", history.history)
+        self.assertEqual(history.v["version"], self.version)
+        self.assertIn("session_id", history.v)
+        self.assertIn("timestamp", history.v)
+        self.assertIn("framework_agent_ctx", history.v)
+        self.assertIn("workflow_agent_ctx", history.v)
+        self.assertIn("code_agent_ctx", history.v)
+        self.assertIn("validator_agent_ctx", history.v)
+        self.assertIn("original_user_input", history.v)
+        self.assertIn("generated_framework", history.v)
+        self.assertIn("generated_code", history.v)
+        self.assertIn("generated_workflow", history.v)
+        self.assertIn("generated_config", history.v)
+        self.assertIn("status", history.v)
 
     def test_save_and_load_history(self):
         # Save history
@@ -39,29 +39,26 @@ class TestHistoryFunctionality(unittest.TestCase):
 
         # Load history from file
         loaded_history = History(self.version, session_id=self.history.session_id, dir ="test_runs")
-        self.assertEqual(loaded_history.history, self.history.history)
+        self.assertEqual(loaded_history.history, self.history.v)
 
     def test_add_agent_history(self):
         agent_context = [{"key": "value"}]
         self.history.add_agent_history("framework", agent_context, "Generated framework content")
 
-        self.assertEqual(self.history.history["framework_agent_ctx"], agent_context)
-        self.assertEqual(self.history.history["generated_framework"], "Generated framework content")
-        self.assertTrue(self.history.history["status"]["framework"])
+        self.assertEqual(self.history.v["framework_agent_ctx"], agent_context)
+        self.assertEqual(self.history.v["generated_framework"], "Generated framework content")
+        self.assertTrue(self.history.v["status"]["framework"])
 
-    def test_set_validation_status(self):
-        self.history.set_validation_status(True)
-        self.assertTrue(self.history.history["status"]["validation"])
 
     def test_set_original_user_input(self):
         user_input = "User input example"
-        self.history.set_original_user_input(user_input)
-        self.assertEqual(self.history.history["original_user_input"], user_input)
+        self.history.set_original_user_description(user_input)
+        self.assertEqual(self.history.v["original_user_input"], user_input)
 
     def test_update_generated_content(self):
         generated_content = "Updated generated content"
-        self.history.update_generated_content("code", generated_content)
-        self.assertEqual(self.history.history["generated_code"], generated_content)
+        self.history.update_generated("code", generated_content)
+        self.assertEqual(self.history.v["generated_code"], generated_content)
 
 
 if __name__ == '__main__':

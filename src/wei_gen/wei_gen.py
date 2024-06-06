@@ -3,58 +3,91 @@ from agents.agent import FrameworkAgent
 from gen.gen_env import WorkflowGen, ConfigGen, CodeGen
 from history.interface import History
 from typing import Optional, Dict, Any
-
+import time
 class Session:
     def __init__(self, config: Dict[str, Any], session_id: Optional[str] = None):
         """
         Initialize the session
         """
-        self.history = History("0.0.1", session_id)
         self.version: str = "0.0.1" # TODO load from toml or similar
-
-        self.framework: FrameworkAgent = FrameworkAgent(config)
-        
-        # load with history if session_id is provided
-        if session_id:
-            self.framework = FrameworkAgent(config, self.history.agent_context)
-                
-        self.workflow_gen_env: WorkflowGen = WorkflowGen(config,)
-        self.config_gen_env: ConfigGen = ConfigGen(config)
-        self.code_gen_env: CodeGen = CodeGen(config)
+        self.config = config
         self.validation_threshold: float = config["settings"]["validation_threshold"]
 
-    def execute_experiment(self, user_input: str) -> None:
+
+        self._handle_history(session_id)
+    
+    def _handle_history(self, session_id = None):
+        self.history = History(self.version, session_id= session_id)
+        self.session_id = self.history.session_id
+
+        print(f"Session ID: {self.session_id} {self.history.v}")
+        self.framework: FrameworkAgent = FrameworkAgent( self.config, self.history.v["framework_agent_ctx"]) 
+        self.workflow_gen_env: WorkflowGen = WorkflowGen( self.config, self.history.v["workflow_agent_ctx"])
+        self.code_gen_env: CodeGen = CodeGen(self.config, self.history.v["code_agent_ctx"])
+    
+
+    def execute_experiment(self, user_description: str, user_values = None) -> None:
         """
         Execute the experiment
         """
-        self.history.set_original_user_input(user_input)
-        prob = self.framework.validate_experiment(user_input)
-        if prob < self.validation_threshold:
-            raise Exception(f"Experiment is not valid. Validator returned a probability < {self.validation_threshold} ({prob}). Check modules available and try again.")
-        self.history.set_validation_status(True)
+        start_time = time.time()
+        self.framework_step(user_description, user_values)
+        self.workflow_step()
+        self.code_step()
+        self.config_step()
+        print(f"Experiment completed successfully in {(time.time() - start_time):.2f} seconds")
 
-        experiment_framework = self.gen_experiment_framework(user_input)
+ 
+
+    def framework_step(self, user_description, user_values):
+        temp_start = time.time()
+        print("Starting experiment...")
+        self.history.set_user_inputs(user_description, user_values)
+        is_valid, info = self.framework.validate_experiment(user_description)
+        if not is_valid:
+            raise Exception(f"Experiment is not valid. Validator returned a probability < {self.validation_threshold}. {info}")
+        print(f"Experiment valid. Continuing...")
+
+        experiment_framework = self.framework.gen_experiment_framework(user_description)
+        print("experiment_framework", experiment_framework)
         self.history.add_agent_history("framework", self.framework.ctx, experiment_framework)
+        print(f"Experiment Framework generated in {(time.time() - temp_start):.2f} seconds. Continuing...")
 
-        workflow = self.workflow_gen_env.generate_code(experiment_framework)
-        self.history.add_agent_history("workflow", self.workflow_gen_env.ctx, workflow)
+    
+    def workflow_step(self):
+        temp_start = time.time()
+        workflow = self.workflow_gen_env.generate_code(self.history.get_generated("framework"))
+        self.history.add_agent_history("workflow", self.workflow_gen_env.ctx["coder"], workflow)
+        print("workflow", workflow)
+        print(f"Experiment Workflow generated  in {(time.time() - temp_start):.2f} seconds. Continuing...")
 
+    def code_step(self):
+        temp_start = time.time()
+        code = self.code_gen_env.generate_code(self.history.get_generated("framework"), self.history.get_generated("workflow"))
+        self.history.add_agent_history("code", self.code_gen_env.ctx["coder"], code)
+        print("code", code)
+        print(f"Experiment Code generated in {(time.time() - temp_start):.2f} seconds. Continuing...")
 
-        code = self.code_gen_env.generate_code(experiment_framework, workflow)
-        self.history.add_agent_history("code", self.code_gen_env.ctx, code)
-
-        config = self.config_gen_env.generate_code(experiment_framework)
-        self.history.add_agent_history("config", self.config_gen_env.ctx, config)
-
-        print("Experiment completed successfully.")
+    def config_step(self):
+        config_instruments = self.workflow_gen_env.needs_config()
+        if len(config_instruments) > 0:
+            print(f"Config needed for {''.join(config_instruments)}. Continuing...")
+            user_values = self.history.v["original_user_values"]
+            framework = self.history.get_generated("framework")
+            for instrument in config_instruments:
+                self.config_gen_env: ConfigGen = ConfigGen(config, instrument)
+                config = self.config_gen_env.generate_code(framework, user_values)
+                print("config", config)
+                self.history.add_agent_history("config", self.config_gen_env.ctx, config)
 
     def call_gen_env(self, agent: str, user_input: str) -> str:
         """
         Call the generator environment
         """
+        # self._handle_history(session_id)
         if agent == "framework":
-            resp = self.framework_gen_env.call(user_input)
-            self.history.add_agent_history("framework", self.framework_gen_env.ctx, resp)
+            resp = self.framework.call(user_input)
+            self.history.add_agent_history("framework", self.framework.ctx, resp)
             return resp
         elif agent == "workflow":
             resp = self.workflow_gen_env.call_coder(user_input)
@@ -70,12 +103,19 @@ class Session:
             return resp
         else:
             pass # TODO raise exception
-        
+
+
     def modify_generated_data(self, agent: str, user_input: str) -> None:
         """
         Modify the generated data
         """
-        self.history.update_generated_content(agent, user_input)
+        self.history.update_generated(agent, user_input)
+    
+    def get_history(self) -> Dict[str, Any]:
+        """
+        Get the history of the session
+        """
+        return self.history.v
 
 class WEIGen:
     def __init__(self, config_path: str):
@@ -85,8 +125,5 @@ class WEIGen:
         except Exception as e:
             print(f"Error reading the YAML file: {e}")
     
-    def new_session(self) -> Session:
-        return Session(self.config)
-    
-    def load_session(self, session_id: str) -> Session:
+    def new_session(self, session_id = None) -> Session:
         return Session(self.config, session_id)

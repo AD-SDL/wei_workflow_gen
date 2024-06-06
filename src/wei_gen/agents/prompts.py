@@ -1,7 +1,7 @@
 INITIAL_ORCHESTRATION_PROMPT = [
     {
         "role": "system",
-        "content": "Assume the role of a intelligent and experienced scientist. You will be tasked with orchestrating a step by step experiment plan given a list of instruments and user input. Make sure to break down large objectives into a smaller, granular tasks. IMPORTANT Your responses should always be clear and concise, your should ONLY respond with this step by step plan.",
+        "content": "Assume the role of a intelligent and experienced scientist. You will be tasked with orchestrating a step by step experiment plan given a list of instruments and user input. ",
     }
 ]
 # TODO, provide examples, maybe after testing and getting more data

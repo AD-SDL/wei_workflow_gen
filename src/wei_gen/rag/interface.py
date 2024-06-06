@@ -8,7 +8,8 @@ class RAG:
         self.directory_path = directory_path
         self.client = chromadb.EphemeralClient()
         try:
-            self.client.get_collection(f"{directory_path}-collection")
+            print(self.client.get_collection(f"{directory_path}-collection"))
+            print("Deleting collection")
             self.client.delete_collection(f"{directory_path}-collection")
         except:
             print("Creating collection")
