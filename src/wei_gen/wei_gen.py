@@ -17,13 +17,20 @@ class Session:
         self._handle_history(session_id)
     
     def _handle_history(self, session_id = None):
+        
         self.history = History(self.version, session_id= session_id)
         self.session_id = self.history.session_id
 
         print(f"Session ID: {self.session_id} {self.history.v}")
-        self.framework: FrameworkAgent = FrameworkAgent( self.config, self.history.v["framework_agent_ctx"]) 
+        # TODO make this cleaner
+        self.framework: FrameworkAgent = FrameworkAgent(self.config, self.history.v["framework_agent_ctx"]) 
+        
         self.workflow_gen_env: WorkflowGen = WorkflowGen( self.config, self.history.v["workflow_agent_ctx"])
         self.code_gen_env: CodeGen = CodeGen(self.config, self.history.v["code_agent_ctx"])
+
+        self.workflow_gen_env.set_code(self.history.v["generated_workflow"])
+        self.code_gen_env.set_code(self.history.v["generated_config"])
+        
     
 
     def execute_experiment(self, user_description: str, user_values = None) -> None:
@@ -49,7 +56,6 @@ class Session:
         print(f"Experiment valid. Continuing...")
 
         experiment_framework = self.framework.gen_experiment_framework(user_description)
-        print("experiment_framework", experiment_framework)
         self.history.add_agent_history("framework", self.framework.ctx, experiment_framework)
         print(f"Experiment Framework generated in {(time.time() - temp_start):.2f} seconds. Continuing...")
 
@@ -58,24 +64,27 @@ class Session:
         temp_start = time.time()
         workflow = self.workflow_gen_env.generate_code(self.history.get_generated("framework"))
         self.history.add_agent_history("workflow", self.workflow_gen_env.ctx["coder"], workflow)
-        print("workflow", workflow)
         print(f"Experiment Workflow generated  in {(time.time() - temp_start):.2f} seconds. Continuing...")
 
     def code_step(self):
         temp_start = time.time()
         code = self.code_gen_env.generate_code(self.history.get_generated("framework"), self.history.get_generated("workflow"))
         self.history.add_agent_history("code", self.code_gen_env.ctx["coder"], code)
-        print("code", code)
         print(f"Experiment Code generated in {(time.time() - temp_start):.2f} seconds. Continuing...")
 
     def config_step(self):
+        print("meep")
         config_instruments = self.workflow_gen_env.needs_config()
+        print("sssss23", len(config_instruments))
         if len(config_instruments) > 0:
-            print(f"Config needed for {''.join(config_instruments)}. Continuing...")
-            user_values = self.history.v["original_user_values"]
+            print(f"Config needed for {''.join(config_instruments)}. Continuing...", self.history.v)
+            user_values = self.history.v
             framework = self.history.get_generated("framework")
+
+            print("hhmmm:", config_instruments, user_values, framework)
             for instrument in config_instruments:
-                self.config_gen_env: ConfigGen = ConfigGen(config, instrument)
+                self.config_gen_env: ConfigGen = ConfigGen(config, instrument, self.history.v["config_agent_ctx"])
+                print("hM!?")
                 config = self.config_gen_env.generate_code(framework, user_values)
                 print("config", config)
                 self.history.add_agent_history("config", self.config_gen_env.ctx, config)

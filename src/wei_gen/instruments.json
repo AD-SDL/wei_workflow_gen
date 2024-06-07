@@ -1,714 +1,843 @@
-[
-  {
-    "name": "Biometra",
-    "tags": ["data_acquisition", "plate_reader"],
-    "model": "Analytik Jena Biometra TRobot II",
-    "interface": "wei_rest_node",
-    "version": "0.1.0",
-    "description": "Module for automating a Biometra thermocycler.",
-    "github":"https://github.com/AD-SDL/biometra_module",
-    "actions": [
-      {
-        "name": "run_protocol",
-        "args": [
-          {
-            "name": "plate_type",
-            "type": "int",
-            "default": null,
-            "required": true,
-            "description": "Plate Type Definition."
-          },
-          {
-            "name": "program",
-            "type": "int",
-            "default": null,
-            "required": true,
-            "description": "An identifier for the protocol to be run."
-          }
-        ],
-        "files": []
+{
+  "locations": {
+    "ot2_pcr_alpha.deck1_cooler": {
+      "coordinates": {
+        "pf400": [247.999, -30.702, 275.835, 381.513, 124.83, -585.403],
+        "workcell": [0, 0, 0, 0, 0, 0, 0]
       },
-      {
-        "name": "open_lid",
-        "args": [
-          {
-            "name": "plate_type",
-            "type": "int",
-            "default": null,
-            "required": true,
-            "description": "Plate Type Definition."
-          }
-        ],
-        "files": []
+      "name": "ot2_pcr_alpha.deck1_cooler",
+      "reserved": null,
+      "state": "Empty"
+    },
+    "peeler.default": {
+      "coordinates": {
+        "pf400": [225.521, -24.846, 244.836, 406.623, 80.967, 398.778],
+        "workcell": [0, 0, 0, 0, 0, 0, 0]
       },
-      {
-        "name": "close_lid",
-        "args": [
-          {
-            "name": "plate_type",
-            "type": "int",
-            "default": null,
-            "required": true,
-            "description": "Plate Type Definition."
-          }
-        ],
-        "files": []
+      "name": "peeler.default",
+      "reserved": null,
+      "state": "Empty"
+    },
+    "ot2_cp_gamma.deck2": {
+      "coordinates": {
+        "pf400": [156, 66.112, 83.9, 656.404, 119.405, -946.818],
+        "workcell": [0, 0, 0, 0, 0, 0, 0]
       },
-      {
-        "name": "get_status",
-        "args": [
-          {
-            "name": "plate_type",
-            "type": "int",
-            "default": null,
-            "required": true,
-            "description": "Plate Type Definition."
-          }
-        ],
-        "files": []
-      }
-    ],
-    "resource_pools": []
+      "name": "ot2_cp_gamma.deck2",
+      "reserved": null,
+      "state": "Empty"
+    },
+    "wc.trash": {
+      "coordinates": {
+        "pf400": [259.847, -36.81, 69.09, 687.466, 81.002, 995.035],
+        "workcell": [0, 0, 0, 0, 0, 0, 0]
+      },
+      "name": "wc.trash",
+      "reserved": null,
+      "state": "Empty"
+    },
+    "ot2_growth_beta.deck2": {
+      "coordinates": {
+        "pf400": [163.23, -59.032, 270.965, 415.013, 129.982, -951.51],
+        "workcell": [0, 0, 0, 0, 0, 0, 0]
+      },
+      "name": "ot2_growth_beta.deck2",
+      "reserved": null,
+      "state": "Empty"
+    },
+    "sciclops.exchange": {
+      "coordinates": {
+        "pf400": [223.0, -38.068, 335.876, 325.434, 79.923, 995.062],
+        "sciclops": [0, 0, 0, 0],
+        "workcell": [0.74, -0.2678, 1.0514, 0.7071, 0, 0, 0.7071]
+      },
+      "name": "sciclops.exchange",
+      "reserved": null,
+      "state": "Empty"
+    },
+    "biometra.default": {
+      "coordinates": {
+        "pf400": [247.0, 40.698, 38.294, 728.332, 123.077, 301.082],
+        "workcell": [0, 0, 0, 0, 0, 0, 0]
+      },
+      "name": "biometra.default",
+      "reserved": null,
+      "state": "Empty"
+    },
+    "camera_module.plate_station": {
+      "coordinates": {
+        "pf400": [90.597, 26.416, 66.422, 714.811, 81.916, 995.074],
+        "workcell": [0, 0, 0, 0, 0, 0, 0]
+      },
+      "name": "camera_module.plate_station",
+      "reserved": null,
+      "state": "Empty"
+    },
+    "sealer.default": {
+      "coordinates": {
+        "pf400": [206.087, -2.27, 265.371, 363.978, 76.078, 411.648],
+        "workcell": [0, 0, 0, 0, 0, 0, 0]
+      },
+      "name": "sealer.default",
+      "reserved": null,
+      "state": "Empty"
+    }
   },
-  {
-    "name": "HiG4 Centrifuge",
-    "tags": ["utility", "centrifuge", "sample_processing"],
-    "model": "BioNex HiG 4 Automated Centrifuge",
-    "interface": "wei_rest_node",
-    "version": "0.1.0",
-    "description": "Module for automating the HiG 4 Automated Centrifuge instrument.",
-    "github":"https://github.com/AD-SDL/hig_centrifuge_module",
-    "actions": [
-      {
-        "name": "spin",
-        "args": [
+  "modules": {
+    "hidex": {
+      "about": {
+        "actions": [
+          { "args": [], "files": [], "name": "open" },
+          { "args": [], "files": [], "name": "close" },
           {
-            "name": "gs",
-            "type": "double",
-            "default": null,
-            "required": true,
-            "description": "The number of G's to spin the sample at for the duration."
-          },
-          {
-            "name": "accel_percent",
-            "type": "double",
-            "default": null,
-            "required": true,
-            "description": "How quickly to accelerate the centrifuge up to speed."
-          },
-          {
-            "name": "decel_percent",
-            "type": "double",
-            "default": null,
-            "required": true,
-            "description": "How quickly to decelrate the centrifuge at the end of the spin."
-          },
-          {
-            "name": "time_seconds",
-            "type": "double",
-            "default": null,
-            "required": true,
-            "description": "The time in seconds to spin the sample for."
+            "args": [
+              {
+                "default": null,
+                "description": "Name of the assay to run",
+                "name": "assay_name",
+                "required": true,
+                "type": "str"
+              }
+            ],
+            "files": [],
+            "name": "run_assay"
           }
         ],
-        "files": []
+        "admin_commands": [],
+        "description": "Module for automating the hidex platereader.",
+        "interface": "wei_rest_node",
+        "model": "Hidex Sense Microplate Reader",
+        "name": "Hidex",
+        "resource_pools": [],
+        "version": "0.2.0"
       },
-      {
-        "name": "open_shield",
-        "args": [
+      "active": true,
+      "config": { "rest_node_address": "http://wendy.cels.anl.gov:2005" },
+      "id": "01HVS24RY44AARCESGCD1PGKA4",
+      "interface": "wei_rest_node",
+      "locations": [],
+      "model": "Hidex",
+      "name": "hidex",
+      "reserved": null,
+      "state": "IDLE",
+      "tag": null,
+      "workcell_coordinates": [0, 0, 0, 1, 0, 0, 0]
+    },
+    "sciclops": {
+      "about": {
+        "actions": [
           {
-            "name": "bucket_index",
-            "type": "int",
-            "default": null,
-            "required": true,
-            "description": "Which bucket to present when opening the shield."
+            "args": [
+              {
+                "default": null,
+                "description": "The workcell location to grab the plate from",
+                "name": "pos",
+                "required": true,
+                "type": "str"
+              },
+              {
+                "default": null,
+                "description": "Removes the lid from the plate at position `pos` if True. Default is False.",
+                "name": "lid",
+                "required": false,
+                "type": "bool"
+              },
+              {
+                "default": null,
+                "description": "Throws the lid in the trash if True. Default is False.",
+                "name": "trash",
+                "required": false,
+                "type": "bool"
+              }
+            ],
+            "files": [],
+            "name": "get_plate"
+          },
+          { "args": [], "files": [], "name": "status" },
+          { "args": [], "files": [], "name": "home" }
+        ],
+        "admin_commands": [],
+        "description": "Sciclops is a robotic arm module that grabs a plate from a specific tower location.",
+        "interface": "wei_rest_node",
+        "model": null,
+        "name": "Sciclops Robotic Arm",
+        "resource_pools": [],
+        "version": "1.0.0"
+      },
+      "active": true,
+      "config": { "rest_node_address": "http://parker.cels.anl.gov:2002" },
+      "id": "01HVS24RY4602EBH6TKWBDNNR0",
+      "interface": "wei_rest_node",
+      "locations": [],
+      "model": "sciclops",
+      "name": "sciclops",
+      "reserved": null,
+      "state": "IDLE",
+      "tag": null,
+      "workcell_coordinates": [0.5713, 1.0934, 1.0514, 0.9831, 0, 0, 0.1826]
+    },
+    "sealer": {
+      "about": {
+        "actions": [
+          {
+            "args": [
+              {
+                "default": null,
+                "description": "The amount of time for sealing a plate.",
+                "name": "time",
+                "required": true,
+                "type": "int"
+              },
+              {
+                "default": null,
+                "description": "The temperature to heat the plate to when sealing it.",
+                "name": "temperature",
+                "required": true,
+                "type": "int"
+              }
+            ],
+            "files": [],
+            "name": "seal"
           }
         ],
-        "files": []
+        "admin_commands": [],
+        "description": "Sealer is a robot module that can seal plates.",
+        "interface": "wei_rest_node",
+        "model": null,
+        "name": "Sealer Robot",
+        "resource_pools": [],
+        "version": "0.2.0"
       },
-      {
-        "name": "close_shield",
-        "args": [],
-        "files": []
-      },
-      {
-        "name": "home",
-        "args": [],
-        "files": []
-      },
-      {
-        "name": "abort_spin",
-        "args": [],
-        "files": []
-      }
-    ],
-    "resource_pools": []
-  },
-  {
-    "name": "Epoch2",
-    "tags": ["data_acquisition", "plate_reader"],
-    "model": "BioTek Epoch2 Plate Reader",
-    "interface": "wei_rest_node",
-    "version": "0.1.0",
-    "description": "Module for automating the Epoch 2 platereader.",
-    "github":"https://github.com/AD-SDL/epoch2_module",
-    "actions": [
-      { "name": "open", "args": [], "files": [] },
-      { "name": "close", "args": [], "files": [] },
-      {
-        "name": "run_assay",
-        "args": [
+      "active": true,
+      "config": { "rest_node_address": "http://parker.cels.anl.gov:2000" },
+      "id": "01HVS24RY45BFT3J36GYB7DQP3",
+      "interface": "wei_rest_node",
+      "locations": [],
+      "model": "A4s_sealer",
+      "name": "sealer",
+      "reserved": null,
+      "state": "IDLE",
+      "tag": null,
+      "workcell_coordinates": [0, 0, 0, 1, 0, 0, 0]
+    },
+    "ot2_cp_gamma": {
+      "about": {
+        "actions": [
           {
-            "name": "assay_name",
-            "type": "str",
-            "default": null,
-            "required": true,
-            "description": "Name of the assay to run"
+            "args": [
+              {
+                "default": null,
+                "description": "Not currently implemented.",
+                "name": "resource_path",
+                "required": false,
+                "type": "[str, Path]"
+              },
+              {
+                "default": false,
+                "description": "Whether or not to use the existing resources file (essentially, whether we've restocked or not).",
+                "name": "use_existing_resources",
+                "required": false,
+                "type": "bool"
+              }
+            ],
+            "files": [
+              {
+                "description": "A protocol file to be run (either python or YAML) on the connected OT2.",
+                "name": "protocol",
+                "required": true
+              }
+            ],
+            "name": "run_protocol"
           }
         ],
-        "files": []
-      }
-    ],
-    "resource_pools": []
-  },
-  {
-    "name": "Barty Liquid Manager",
-    "tags": ["liquid_handling", "ink_operations"],
-    "model": "Barty Liquid Manager",
-    "interface": "control_rest_node",
-    "version": "1.0.0",
-    "description": "Module for managing ink operations in motors - a low cost liquid handler.",
-    "actions": [
-      {
-        "name": "drain_ink_all_motors",
-        "args": [
+        "admin_commands": [],
+        "description": "Opentrons OT2 Liquidhandling robot",
+        "interface": "wei_rest_node",
+        "model": "Opentrons OT2",
+        "name": "ot2_gc_gamma",
+        "resource_pools": [],
+        "version": "0.2.0"
+      },
+      "active": true,
+      "config": { "rest_node_address": "http://ot2_gamma_node:2005" },
+      "id": "01HVS24RY4P2JZHRW09G2ZRJ9T",
+      "interface": "wei_rest_node",
+      "locations": [],
+      "model": "ot2",
+      "name": "ot2_cp_gamma",
+      "reserved": null,
+      "state": "IDLE",
+      "tag": null,
+      "workcell_coordinates": [0, 0, 0, 1, 0, 0, 0]
+    },
+    "peeler": {
+      "about": {
+        "actions": [{ "args": [], "files": [], "name": "peel" }],
+        "admin_commands": [],
+        "description": "Brooks Xpeel is a  module that can peel covers off plates.",
+        "interface": "wei_rest_node",
+        "model": null,
+        "name": "Brooks Xpeel",
+        "resource_pools": [],
+        "version": "0.2.0"
+      },
+      "active": true,
+      "config": { "rest_node_address": "http://parker.cels.anl.gov:2001" },
+      "id": "01HVS24RY47R446KQSES2X8BQE",
+      "interface": "wei_rest_node",
+      "locations": [],
+      "model": "brooks_peeler",
+      "name": "peeler",
+      "reserved": null,
+      "state": "IDLE",
+      "tag": null,
+      "workcell_coordinates": [0, 0, 0, 1, 0, 0, 0]
+    },
+    "biometra": {
+      "about": {
+        "actions": [
           {
-            "name": "volume",
-            "type": "int",
-            "default": 100,
-            "required": false,
-            "description": "Volume to drain from all motors in mL."
+            "args": [
+              {
+                "default": null,
+                "description": "Plate Type Definition.",
+                "name": "plate_type",
+                "required": true,
+                "type": "int"
+              },
+              {
+                "default": null,
+                "description": "An identifier for the protocol to be run.",
+                "name": "program",
+                "required": true,
+                "type": "int"
+              }
+            ],
+            "files": [],
+            "name": "run_protocol"
+          },
+          {
+            "args": [
+              {
+                "default": null,
+                "description": "Plate Type Definition.",
+                "name": "plate_type",
+                "required": true,
+                "type": "int"
+              }
+            ],
+            "files": [],
+            "name": "open_lid"
+          },
+          {
+            "args": [
+              {
+                "default": null,
+                "description": "Plate Type Definition.",
+                "name": "plate_type",
+                "required": true,
+                "type": "int"
+              }
+            ],
+            "files": [],
+            "name": "close_lid"
+          },
+          {
+            "args": [
+              {
+                "default": null,
+                "description": "Plate Type Definition.",
+                "name": "plate_type",
+                "required": true,
+                "type": "int"
+              }
+            ],
+            "files": [],
+            "name": "get_status"
           }
         ],
-        "files": []
+        "admin_commands": [],
+        "description": "Module for automatting a Biometra thermocycler.",
+        "interface": "wei_rest_node",
+        "model": "Analytik Jena Biometra TRobot II",
+        "name": "Biometra",
+        "resource_pools": [],
+        "version": "0.1.0"
       },
-      {
-        "name": "fill_ink_all_motors",
-        "args": [
+      "active": true,
+      "config": { "rest_node_address": "http://wendy.cels.anl.gov:2002" },
+      "id": "01HVS24RY4Z3TERT69JG8VR9B3",
+      "interface": "wei_rest_node",
+      "locations": [],
+      "model": "Biometra TRobot II",
+      "name": "biometra",
+      "reserved": null,
+      "state": "IDLE",
+      "tag": null,
+      "workcell_coordinates": null
+    },
+    "ot2_pcr_alpha": {
+      "about": {
+        "actions": [
           {
-            "name": "volume",
-            "type": "int",
-            "default": 60,
-            "required": false,
-            "description": "Volume to refill all motors in mL."
+            "args": [
+              {
+                "default": null,
+                "description": "Not currently implemented.",
+                "name": "resource_path",
+                "required": false,
+                "type": "[str, Path]"
+              },
+              {
+                "default": false,
+                "description": "Whether or not to use the existing resources file (essentially, whether we've restocked or not).",
+                "name": "use_existing_resources",
+                "required": false,
+                "type": "bool"
+              }
+            ],
+            "files": [
+              {
+                "description": "A protocol file to be run (either python or YAML) on the connected OT2.",
+                "name": "protocol",
+                "required": true
+              }
+            ],
+            "name": "run_protocol"
           }
         ],
-        "files": []
+        "admin_commands": [],
+        "description": "Opentrons OT2 Liquidhandling robot",
+        "interface": "wei_rest_node",
+        "model": "Opentrons OT2",
+        "name": "ot2_pcr_alpha",
+        "resource_pools": [],
+        "version": "0.2.0"
       },
-      {
-        "name": "refill_ink",
-        "args": [
+      "active": true,
+      "config": { "rest_node_address": "http://ot2_alpha_node:2003" },
+      "id": "01HVS24RY4DAHK1MB712FKVVJ0",
+      "interface": "wei_rest_node",
+      "locations": [],
+      "model": "ot2",
+      "name": "ot2_pcr_alpha",
+      "reserved": null,
+      "state": "IDLE",
+      "tag": null,
+      "workcell_coordinates": [0, 0, 0, 1, 0, 0, 0]
+    },
+    "barty": {
+      "about": { "detail": "Not Found" },
+      "active": true,
+      "config": {
+        "rest_node_address": "http://kirby.cels.anl.gov:8000",
+        "rest_node_auth": ""
+      },
+      "id": "01HVS24RY424RAAP0N8FN4X0C5",
+      "interface": "wei_rest_node",
+      "locations": [],
+      "model": "RPL BARTY",
+      "name": "barty",
+      "reserved": null,
+      "state": "IDLE",
+      "tag": null,
+      "workcell_coordinates": [0, 0, 0, 1, 0, 0, 0]
+    },
+    "pf400": {
+      "about": {
+        "actions": [
           {
-            "name": "motors",
-            "type": "list",
-            "default": null,
-            "required": true,
-            "description": "Specific motors to refill."
+            "args": [
+              {
+                "default": null,
+                "description": "Source location in the workcell for pf400 to grab plate from.",
+                "name": "source",
+                "required": true,
+                "type": "str"
+              },
+              {
+                "default": null,
+                "description": "Transfer location in the workcell for pf400 to transfer plate to.",
+                "name": "target",
+                "required": true,
+                "type": "str"
+              },
+              {
+                "default": null,
+                "description": "Plate rotation for source location in the workcell.",
+                "name": "source_plate_rotation",
+                "required": true,
+                "type": "str"
+              },
+              {
+                "default": null,
+                "description": "Plate rotation for target location in the workcell.",
+                "name": "target_plate_rotation",
+                "required": true,
+                "type": "str"
+              }
+            ],
+            "files": [],
+            "name": "transfer"
           },
           {
-            "name": "volume",
-            "type": "int",
-            "default": 5,
-            "required": false,
-            "description": "Volume to refill in specified motors in mL."
+            "args": [
+              {
+                "default": null,
+                "description": "Target location in the workcell that the plate is currently at.",
+                "name": "target",
+                "required": true,
+                "type": "str"
+              },
+              {
+                "default": null,
+                "description": "Lid height of the target plate.",
+                "name": "lid_height",
+                "required": true,
+                "type": "str"
+              },
+              {
+                "default": null,
+                "description": "Rotation of plate at target location in the workcell.",
+                "name": "target_plate_rotation",
+                "required": true,
+                "type": "str"
+              }
+            ],
+            "files": [],
+            "name": "remove_lid"
+          },
+          {
+            "args": [
+              {
+                "default": null,
+                "description": "Target location in workcell that plate is currently at.",
+                "name": "target",
+                "required": true,
+                "type": "str"
+              },
+              {
+                "default": null,
+                "description": "Lid height of the target plate.",
+                "name": "lid_height",
+                "required": true,
+                "type": "str"
+              },
+              {
+                "default": null,
+                "description": "Rotation of plate at target location in the workcell.",
+                "name": "target_plate_rotation",
+                "required": true,
+                "type": "str"
+              }
+            ],
+            "files": [],
+            "name": "replace_lid"
           }
         ],
-        "files": []
-      }
-    ],
-    "resource_pools": []
-  },
-  {
-    "name": "URRobotModule",
-    "tags": ["robotic_manipulation", "plate_handling", "plate_mover"],
-    "model": "UR3, UR5, UR16",
-    "description": "UR robots are 6 degrees of freedom manipulators. Different models of these robots allow carrying heavier payloads and reaching longer distances. This robot is mainly used in pick and place jobs.",
-    "interface": "wei_rest_node",
-    "version": "extracted_from_pyproject.toml",
-    "github":"https://github.com/AD-SDL/ur_module",
-    "actions": [
-      {
-        "name": "transfer",
-        "description": "This action transfers a plate from a source robot location to a target robot location.",
-        "args": [
-          {
-            "name": "source",
-            "description": "Source location in the workcell for the robot to grab the plate from.",
-            "type": "str",
-            "required": true
-          },
-          {
-            "name": "target",
-            "description": "Transfer location in the workcell for the robot to transfer the plate to.",
-            "type": "str",
-            "required": true
-          },
-          {
-            "name": "source_plate_rotation",
-            "description": "Plate rotation for source location in the workcell.",
-            "type": "str",
-            "required": true
-          },
-          {
-            "name": "target_plate_rotation",
-            "description": "Plate rotation for target location in the workcell.",
-            "type": "str",
-            "required": true
-          }
-        ]
+        "admin_commands": [],
+        "description": "pf400 is a robot module that moves plates between two robot locations.",
+        "interface": "wei_rest_node",
+        "model": "Precise Automation PF400",
+        "name": "Pf400 Robotic Arm",
+        "resource_pools": [],
+        "version": "0.2.0"
       },
-      {
-        "name": "remove_lid",
-        "description": "This action removes the lid off of a plate.",
-        "args": [
+      "active": true,
+      "config": { "rest_node_address": "http://pf400_node:3000" },
+      "id": "01HVS24RY4ZWDSCV1BTS751R24",
+      "interface": "wei_rest_node",
+      "locations": [],
+      "model": "pf400",
+      "name": "pf400",
+      "reserved": null,
+      "state": "IDLE",
+      "tag": null,
+      "workcell_coordinates": [0, 0, 0, 1, 0, 0, 0]
+    },
+    "camera_module": {
+      "about": {
+        "actions": [
           {
-            "name": "target",
-            "description": "Target location in the workcell that the plate is currently at.",
-            "type": "str",
-            "required": true
-          },
-          {
-            "name": "lid_height",
-            "description": "Lid height of the target plate.",
-            "type": "str",
-            "required": true
-          },
-          {
-            "name": "target_plate_rotation",
-            "description": "Rotation of plate at target location in the workcell.",
-            "type": "str",
-            "required": true
-          }
-        ]
-      },
-      {
-        "name": "replace_lid",
-        "description": "This action places a lid on a plate with no lid.",
-        "args": [
-          {
-            "name": "target",
-            "description": "Target location in the workcell that the plate is currently at.",
-            "type": "str",
-            "required": true
-          },
-          {
-            "name": "lid_height",
-            "description": "Lid height of the target plate.",
-            "type": "str",
-            "required": true
-          },
-          {
-            "name": "target_plate_rotation",
-            "description": "Rotation of plate at target location in the workcell.",
-            "type": "str",
-            "required": true
-          }
-        ]
-      }
-    ],
-    "resource_pools": []
-  },
-  {
-    "name": "fom",
-    "tags": ["gate_operations", "fom_process"],
-    "model": "Unknown",
-    "version": "0.0.1",
-    "description": "Module for gate operations and running the fom process.",
-    "github":"https://github.com/AD-SDL/fom_module",
-    "actions": [
-      {
-        "name": "open_gate",
-        "description": "Opens the gate based on a configuration.",
-        "args": [
-          {
-            "name": "config",
-            "type": "str",
-            "required": true,
-            "description": "Configuration settings to open the gate."
+            "args": [
+              {
+                "default": "image.jpg",
+                "description": "",
+                "name": "file_name",
+                "required": false,
+                "type": "str"
+              }
+            ],
+            "files": [],
+            "name": "take_picture"
           }
         ],
-        "files": []
+        "admin_commands": [],
+        "description": "A module that interfaces with a USB camera",
+        "interface": "wei_rest_node",
+        "model": null,
+        "name": "Webcam Module",
+        "resource_pools": [],
+        "version": "1.3.0"
       },
-      {
-        "name": "close_gate",
-        "description": "Closes the gate based on a configuration.",
-        "args": [
-          {
-            "name": "config",
-            "type": "str",
-            "required": true,
-            "description": "Configuration settings to close the gate."
-          }
+      "active": true,
+      "config": { "rest_node_address": "http://parker.cels.anl.gov:3001" },
+      "id": "01HVS24RY4QMT12XKKV1HE7T04",
+      "interface": "wei_rest_node",
+      "locations": [],
+      "model": "camera (logitech)",
+      "name": "camera_module",
+      "reserved": null,
+      "state": "IDLE",
+      "tag": null,
+      "workcell_coordinates": [0, 0, 0, 1, 0, 0, 0]
+    }
+  },
+  "workflows": {},
+  "workcell": {
+    "locations": {
+      "pf400": {
+        "biometra.default": [247.0, 40.698, 38.294, 728.332, 123.077, 301.082],
+        "camera_module.plate_station": [
+          90.597, 26.416, 66.422, 714.811, 81.916, 995.074
         ],
-        "files": []
-      },
-      {
-        "name": "run_fom",
-        "description": "Runs the fom process based on a configuration.",
-        "args": [
-          {
-            "name": "config",
-            "type": "str",
-            "required": true,
-            "description": "Configuration settings to run the fom process."
-          }
+        "ot2_cp_gamma.deck2": [156, 66.112, 83.9, 656.404, 119.405, -946.818],
+        "ot2_growth_beta.deck2": [
+          163.23, -59.032, 270.965, 415.013, 129.982, -951.51
         ],
-        "files": []
-      }
-    ],
-    "repo": "https://github.com/AD-SDL/fom_module.git"
-  },
-  {
-    "name": "Sleep Module",
-    "tags": ["utilities", "sleep"],
-    "description": "A module that sleeps for a specified amount of time",
-    "interface": "wei_rest_node",
-    "version": "extracted_from_pyproject.toml",
-    "github":"https://github.com/AD-SDL/sleep_module",
-    "actions": [
-      {
-        "name": "sleep",
-        "description": "Sleep for a specified amount of time",
-        "args": [
-          {
-            "name": "t",
-            "description": "The amount of time to sleep for, as an integer in seconds",
-            "type": "int",
-            "required": true
-          }
+        "ot2_pcr_alpha.deck1_cooler": [
+          247.999, -30.702, 275.835, 381.513, 124.83, -585.403
         ],
-        "files": []
-      }
-    ],
-    "resource_pools": []
-  },
-  {
-    "name": "Camera Module",
-    "tags": ["data_acquisition", "camera"],
-    "description": "A module that interfaces with a USB camera",
-    "interface": "wei_rest_node",
-    "version": "extract_version(Path(__file__).parent.parent / \"pyproject.toml\")",
-    "github":"https://github.com/AD-SDL/camera_module/tree/main",
-    "actions": [
-      {
-        "name": "take_picture",
-        "description": "Take a picture from the camera",
-        "args": [
-          {
-            "name": "file_name",
-            "description": "Name of the file to save the image to",
-            "type": "str",
-            "required": false,
-            "default": "image.jpg"
-          }
-        ]
-      }
-    ],
-    "resource_pools": []
-  },
-  {
-    "name": "Pf400 Robotic Arm",
-    "tags": ["robotic_manipulation", "plate_handling", "plate_mover"],
-    "model": "Precise Automation PF400",
-    "description": "pf400 is a robot module that moves plates between two robot locations.",
-    "interface": "wei_rest_node",
-    "version": "extract_version(Path(__file__).parent.parent / \"pyproject.toml\")",
-    "github": "https://github.com/AD-SDL/pf400_module/tree/main",
-    "actions": [
-      {
-        "name": "transfer",
-        "description": "This action transfers a plate from a source robot location to a target robot location.",
-        "args": [
-          {
-            "name": "source",
-            "description": "Source location in the workcell for pf400 to grab plate from.",
-            "type": "str",
-            "required": true
-          },
-          {
-            "name": "target",
-            "description": "Transfer location in the workcell for pf400 to transfer plate to.",
-            "type": "str",
-            "required": true
-          },
-          {
-            "name": "source_plate_rotation",
-            "description": "Plate rotation for source location in the workcell.",
-            "type": "str",
-            "required": true
-          },
-          {
-            "name": "target_plate_rotation",
-            "description": "Plate rotation for target location in the workcell.",
-            "type": "str",
-            "required": true
-          }
-        ]
-      },
-      {
-        "name": "remove_lid",
-        "description": "This action removes the lid off of a plate",
-        "args": [
-          {
-            "name": "target",
-            "description": "Target location in the workcell that the plate is currently at.",
-            "type": "str",
-            "required": true
-          },
-          {
-            "name": "lid_height",
-            "description": "Lid height of the target plate.",
-            "type": "str",
-            "required": true
-          },
-          {
-            "name": "target_plate_rotation",
-            "description": "Rotation of plate at target location in the workcell.",
-            "type": "str",
-            "required": true
-          }
-        ]
-      },
-      {
-        "name": "replace_lid",
-        "description": "This action places a lid on a plate with no lid.",
-        "args": [
-          {
-            "name": "target",
-            "description": "Target location in workcell that plate is currently at.",
-            "type": "str",
-            "required": true
-          },
-          {
-            "name": "lid_height",
-            "description": "Lid height of the target plate.",
-            "type": "str",
-            "required": true
-          },
-          {
-            "name": "target_plate_rotation",
-            "description": "Rotation of plate at target location in the workcell.",
-            "type": "str",
-            "required": true
-          }
-        ]
-      }
-    ],
-    "resource_pools": []
-  },
-  {
-    "name": "Hidex",
-    "tags": ["data_acquisition", "plate_reader"],
-    "model": "Hidex Sense Microplate Reader",
-    "interface": "wei_rest_node",
-    "version": "0.2.0",
-    "description": "Module for automating the hidex platereader.",
-    "github":"https://github.com/AD-SDL/hidex_module/tree/main",
-    "actions": [
-      {
-        "name": "open",
-        "args": [],
-        "files": []
-      },
-      {
-        "name": "close",
-        "args": [],
-        "files": []
-      },
-      {
-        "name": "run_assay",
-        "args": [
-          {
-            "name": "assay_name",
-            "type": "str",
-            "default": null,
-            "required": true,
-            "description": "Name of the assay to run"
-          }
+        "peeler.default": [225.521, -24.846, 244.836, 406.623, 80.967, 398.778],
+        "sciclops.exchange": [
+          223.0, -38.068, 335.876, 325.434, 79.923, 995.062
         ],
-        "files": []
+        "sealer.default": [206.087, -2.27, 265.371, 363.978, 76.078, 411.648],
+        "wc.trash": [259.847, -36.81, 69.09, 687.466, 81.002, 995.035]
+      },
+      "sciclops": { "sciclops.exchange": [0, 0, 0, 0] },
+      "workcell": {
+        "biometra.default": [0, 0, 0, 0, 0, 0, 0],
+        "camera_module.plate_station": [0, 0, 0, 0, 0, 0, 0],
+        "ot2_cp_gamma.deck2": [0, 0, 0, 0, 0, 0, 0],
+        "ot2_growth_beta.deck2": [0, 0, 0, 0, 0, 0, 0],
+        "ot2_pcr_alpha.deck1_cooler": [0, 0, 0, 0, 0, 0, 0],
+        "peeler.default": [0, 0, 0, 0, 0, 0, 0],
+        "sciclops.exchange": [0.74, -0.2678, 1.0514, 0.7071, 0, 0, 0.7071],
+        "sealer.default": [0, 0, 0, 0, 0, 0, 0],
+        "wc.trash": [0, 0, 0, 0, 0, 0, 0]
       }
-    ],
-    "resource_pools": []
-  },
-  {
-    "name": "Hudson Platecrane",
-    "tags": ["plate_handling", "plate_mover"],
-    "description": "Platecrane is a robotic arm module that can pick up and move plates between locations.",
-    "interface": "wei_rest_node",
-    "version": "extract_version(Path(__file__).parent.parent / \"pyproject.toml\")",
-    "github": "https://github.com/AD-SDL/hudson_platecrane_module/tree/main",
-    "actions": [
+    },
+    "config": {
+      "cold_start_delay": 2,
+      "compute_local_ep": "299edea0-db9a-4693-84ba-babfa655b1be",
+      "data_directory": "/home/app/.wei",
+      "globus_group": "dda56f31-53d1-11ed-bd8b-0db7472df7d6",
+      "globus_local_ep": "",
+      "globus_portal_ep": "bb8d048a-2cad-4029-a9c7-671ec5d1f84d",
+      "globus_search_index": "aefcecc6-e554-4f8c-a25b-147f23091944",
+      "log_level": 20,
+      "redis_host": "rpl_redis",
+      "redis_port": 6379,
+      "reset_locations": true,
+      "sequential_scheduler": false,
+      "server_host": "rpl_modular_wc_server",
+      "server_port": 8000,
+      "update_interval": 5.0,
+      "use_diaspora": true,
+      "verify_locations_before_transfer": false,
+      "workcell_origin_coordinates": [9.4307, -10.4176, 0, 1, 0, 0, 0]
+    },
+    "modules": [
       {
-        "name": "transfer",
-        "description": "This action picks up a plate from one location and transfers it to another.",
-        "args": [
-          {
-            "name": "source",
-            "description": "The workcell location to grab the plate from",
-            "type": "List[float], str",
-            "required": true
-          },
-          {
-            "name": "target",
-            "description": "The workcell location to put the plate at",
-            "type": "List[float], str",
-            "required": true
-          },
-          {
-            "name": "plate_type",
-            "description": "Type of plate.",
-            "type": "str",
-            "required": false,
-            "default": "96_well"
-          }
-        ]
+        "about": null,
+        "active": true,
+        "config": { "rest_node_address": "http://parker.cels.anl.gov:2000" },
+        "id": "01HVS24RY45BFT3J36GYB7DQP3",
+        "interface": "wei_rest_node",
+        "locations": [],
+        "model": "A4s_sealer",
+        "name": "sealer",
+        "reserved": null,
+        "state": "INIT",
+        "tag": null,
+        "workcell_coordinates": [0, 0, 0, 1, 0, 0, 0]
       },
       {
-        "name": "remove_lid",
-        "description": "This action picks up a plate's lid from one location and places it at another.",
-        "args": [
-          {
-            "name": "source",
-            "description": "The workcell location to grab the lid from",
-            "type": "List[float], str",
-            "required": true
-          },
-          {
-            "name": "target",
-            "description": "The workcell location to put the lid",
-            "type": "List[float], str",
-            "required": true
-          },
-          {
-            "name": "plate_type",
-            "description": "Type of plate.",
-            "type": "str",
-            "required": false,
-            "default": "96_well"
-          }
-        ]
+        "about": null,
+        "active": true,
+        "config": { "rest_node_address": "http://parker.cels.anl.gov:2001" },
+        "id": "01HVS24RY47R446KQSES2X8BQE",
+        "interface": "wei_rest_node",
+        "locations": [],
+        "model": "brooks_peeler",
+        "name": "peeler",
+        "reserved": null,
+        "state": "INIT",
+        "tag": null,
+        "workcell_coordinates": [0, 0, 0, 1, 0, 0, 0]
       },
       {
-        "name": "replace_lid",
-        "description": "This action picks up an unattached plate lid and places it on a plate.",
-        "args": [
-          {
-            "name": "source",
-            "description": "The workcell location to grab the lid from",
-            "type": "List[float], str",
-            "required": true
-          },
-          {
-            "name": "target",
-            "description": "The workcell location to put the lid",
-            "type": "List[float], str",
-            "required": true
-          },
-          {
-            "name": "plate_type",
-            "description": "Type of plate.",
-            "type": "str",
-            "required": false,
-            "default": "96_well"
-          }
-        ]
-      }
-    ],
-    "resource_pools": []
-  },
-  {
-    "name": "Sealer Robot",
-    "tags": ["plate_handling", "plate_sealer"],
-    "description": "Sealer is a robot module that can seal plates.",
-    "interface": "wei_rest_node",
-    "version": "extract_version(Path(__file__).parent.parent / \"pyproject.toml\")",
-    "github": "https://github.com/AD-SDL/a4s_sealer_module/tree/main",
-    "actions": [
+        "about": null,
+        "active": true,
+        "config": { "rest_node_address": "http://parker.cels.anl.gov:2002" },
+        "id": "01HVS24RY4602EBH6TKWBDNNR0",
+        "interface": "wei_rest_node",
+        "locations": [],
+        "model": "sciclops",
+        "name": "sciclops",
+        "reserved": null,
+        "state": "INIT",
+        "tag": null,
+        "workcell_coordinates": [0.5713, 1.0934, 1.0514, 0.9831, 0, 0, 0.1826]
+      },
       {
-        "name": "seal",
-        "description": "This action seals a plate that is currently in the sealer robot.",
-        "args": []
-      }
-    ],
-    "resource_pools": []
-  },
-  {
-    "name": "Brooks Xpeel",
-    "tags": ["plate_handling", "plate_peeler"],
-    "description": "Brooks Xpeel is a module that can peel covers off plates.",
-    "interface": "wei_rest_node",
-    "version": "extract_version(Path(__file__).parent.parent / \"pyproject.toml\")",
-    "github": "https://github.com/AD-SDL/brooks_xpeel_module/tree/main",
-    "actions": [
+        "about": null,
+        "active": true,
+        "config": { "rest_node_address": "http://ot2_alpha_node:2003" },
+        "id": "01HVS24RY4DAHK1MB712FKVVJ0",
+        "interface": "wei_rest_node",
+        "locations": [],
+        "model": "ot2",
+        "name": "ot2_pcr_alpha",
+        "reserved": null,
+        "state": "INIT",
+        "tag": null,
+        "workcell_coordinates": [0, 0, 0, 1, 0, 0, 0]
+      },
       {
-        "name": "peel",
-        "description": "This action peels a plate that is currently in the peeling station.",
-        "args": []
-      }
-    ],
-    "resource_pools": []
-  },
-  {
-    "name": "Opentrons OT2",
-    "model": "Opentrons OT2",
-    "tags": ["liquid handling"],
-    "description": "Opentrons OT2 Liquidhandling robot",
-    "interface": "wei_rest_node",
-    "version": "extract_version(Path(__file__).parent.parent / \"pyproject.toml\")",
-    "github": "https://github.com/AD-SDL/ot2_module/tree/main",
-    "actions": [
+        "about": null,
+        "active": false,
+        "config": { "rest_node_address": "http://ot2_beta_node:2004" },
+        "id": "01HVS24RY4AG3CKK1FXGA9V2Z6",
+        "interface": "wei_rest_node",
+        "locations": [],
+        "model": "ot2",
+        "name": "ot2_gc_beta",
+        "reserved": null,
+        "state": "INIT",
+        "tag": null,
+        "workcell_coordinates": [0, 0, 0, 1, 0, 0, 0]
+      },
       {
-        "name": "run_protocol",
-        "description": "Runs an Opentrons protocol (either python or YAML) on the connected OT2.",
-        "args": [
-          {
-            "name": "resource_path",
-            "description": "Not currently implemented.",
-            "type": "[str, Path]",
-            "required": false,
-            "default": null
-          },
-          {
-            "name": "use_existing_resources",
-            "description": "Whether or not to use the existing resources file (essentially, whether we've restocked or not).",
-            "type": "bool",
-            "required": false,
-            "default": false
-          }
-        ],
-        "files": [
-          {
-            "name": "protocol",
-            "required": true,
-            "description": "A protocol file to be run (either python or YAML) on the connected OT2."
-          }
-        ]
+        "about": null,
+        "active": true,
+        "config": { "rest_node_address": "http://ot2_gamma_node:2005" },
+        "id": "01HVS24RY4P2JZHRW09G2ZRJ9T",
+        "interface": "wei_rest_node",
+        "locations": [],
+        "model": "ot2",
+        "name": "ot2_cp_gamma",
+        "reserved": null,
+        "state": "INIT",
+        "tag": null,
+        "workcell_coordinates": [0, 0, 0, 1, 0, 0, 0]
+      },
+      {
+        "about": null,
+        "active": true,
+        "config": { "rest_node_address": "http://pf400_node:3000" },
+        "id": "01HVS24RY4ZWDSCV1BTS751R24",
+        "interface": "wei_rest_node",
+        "locations": [],
+        "model": "pf400",
+        "name": "pf400",
+        "reserved": null,
+        "state": "INIT",
+        "tag": null,
+        "workcell_coordinates": [0, 0, 0, 1, 0, 0, 0]
+      },
+      {
+        "about": null,
+        "active": true,
+        "config": { "rest_node_address": "http://parker.cels.anl.gov:3001" },
+        "id": "01HVS24RY4QMT12XKKV1HE7T04",
+        "interface": "wei_rest_node",
+        "locations": [],
+        "model": "camera (logitech)",
+        "name": "camera_module",
+        "reserved": null,
+        "state": "INIT",
+        "tag": null,
+        "workcell_coordinates": [0, 0, 0, 1, 0, 0, 0]
+      },
+      {
+        "about": null,
+        "active": true,
+        "config": { "rest_node_address": "http://wendy.cels.anl.gov:2005" },
+        "id": "01HVS24RY44AARCESGCD1PGKA4",
+        "interface": "wei_rest_node",
+        "locations": [],
+        "model": "Hidex",
+        "name": "hidex",
+        "reserved": null,
+        "state": "INIT",
+        "tag": null,
+        "workcell_coordinates": [0, 0, 0, 1, 0, 0, 0]
+      },
+      {
+        "about": null,
+        "active": true,
+        "config": {
+          "rest_node_address": "http://kirby.cels.anl.gov:8000",
+          "rest_node_auth": ""
+        },
+        "id": "01HVS24RY424RAAP0N8FN4X0C5",
+        "interface": "wei_rest_node",
+        "locations": [],
+        "model": "RPL BARTY",
+        "name": "barty",
+        "reserved": null,
+        "state": "INIT",
+        "tag": null,
+        "workcell_coordinates": [0, 0, 0, 1, 0, 0, 0]
+      },
+      {
+        "about": null,
+        "active": false,
+        "config": {
+          "rest_node_address": "http://mirbase1.cels.anl.gov/api/v2.0.0/",
+          "rest_node_auth": "/home/rpl/Documents/mirauth.txt"
+        },
+        "id": "01HVS24RY4SBXNHG0QE6HSVCQE",
+        "interface": "wei_rest_node",
+        "locations": [],
+        "model": "MiR250",
+        "name": "MiR_base",
+        "reserved": null,
+        "state": "INIT",
+        "tag": null,
+        "workcell_coordinates": [0, 0, 0, 1, 0, 0, 0]
+      },
+      {
+        "about": null,
+        "active": false,
+        "config": { "ros_node_address": "/ur5_client/UR5_Client_Node" },
+        "id": "01HVS24RY4YC61SSSG5ZP2XPYZ",
+        "interface": "wei_ros_node",
+        "locations": [],
+        "model": "ur5",
+        "name": "ur5",
+        "reserved": null,
+        "state": "INIT",
+        "tag": null,
+        "workcell_coordinates": [0, 0, 0, 1, 0, 0, 0]
+      },
+      {
+        "about": null,
+        "active": true,
+        "config": { "rest_node_address": "http://wendy.cels.anl.gov:2002" },
+        "id": "01HVS24RY4Z3TERT69JG8VR9B3",
+        "interface": "wei_rest_node",
+        "locations": [],
+        "model": "Biometra TRobot II",
+        "name": "biometra",
+        "reserved": null,
+        "state": "INIT",
+        "tag": null,
+        "workcell_coordinates": null
       }
     ],
-    "resource_pools": []
+    "name": "RPL_Modular_workcell"
   }
-  
-  
-  
-  
-  
-  
-
-  
-  
-  
-  
-  
-  
-]
+}

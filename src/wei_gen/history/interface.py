@@ -10,6 +10,7 @@ class History:
         Initialize the history of the session
         """
         self.session_id: str = session_id if session_id else str(uuid.uuid4())
+        print("passed", session_id, "using", self.session_id)
         starting_time = time.time()
         # Define the path to the JSON file 
         base_dir: str = os.path.dirname(os.path.abspath(__file__))
@@ -22,7 +23,7 @@ class History:
         else:
             self.v: Dict[str, Any] = {
                 "version": version,
-                "session_id": str(uuid.uuid4()),
+                "session_id":  self.session_id,
                 "timestamp": starting_time,
                 "validity": 0,
 
@@ -33,6 +34,7 @@ class History:
                 "workflow_agent_ctx": None,
                 "code_agent_ctx": None,
                 "validator_agent_ctx": None,
+                "config_agent_ctx": None,
                
 
                 "generated_framework": "",
@@ -81,3 +83,10 @@ class History:
 
     def get_generated(self, agent_type: str):
         return self.v[f"generated_{agent_type}"]
+    
+
+
+    def get_user_values(self):
+        print("original_user_values", self.v["original_user_values"],self.v)
+        return self.v["original_user_values"]
+

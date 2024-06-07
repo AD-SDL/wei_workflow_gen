@@ -21,8 +21,12 @@ class GenEnv:
     def call_coder(self, user_input):
         return self.coder.call_engine(user_input)
     
+    def set_code(self, generated_code):
+        self.code = generated_code
+    
     def generate_code(self):
         raise NotImplementedError("This method should be implemented by subclasses.")
+    
 
 class WorkflowGen(GenEnv):
     def __init__(self, config, loaded_code_ctx):
@@ -56,14 +60,18 @@ class WorkflowGen(GenEnv):
     
     def needs_config(self) -> list:
         config_instruments = []
+        print(self.config["needs_config"])
         for module in self.config["needs_config"]:
+            print()
             if module in self.code:
                 config_instruments.append(module)
         return config_instruments
     
 class ConfigGen(GenEnv):
-    def __init__(self, config, instrument):
-        coder: ConfigAgent = ConfigAgent(config, instrument)
+    def __init__(self, config, instrument, loaded_code_ctx):
+        print("ooop")
+        coder: ConfigAgent = ConfigAgent(config, instrument, loaded_code_ctx)
+        print("uppppp")
         super().__init__(config, coder, None)
 
     def generate_code(self, experiment_framework, user_values):
