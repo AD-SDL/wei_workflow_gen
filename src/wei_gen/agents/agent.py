@@ -57,6 +57,9 @@ class Agent:
             "gpt-4": lambda: openai_completion_with_backoff(
                 engine=self.engine, model=self.model, messages=messages
             ),
+             "gpt-4o": lambda: openai_completion_with_backoff(
+                engine=self.engine, model=self.model, messages=messages
+            ),
             "gpt-4-turbo": lambda: openai_completion_with_backoff(
                 engine=self.engine, model=self.model, messages=messages
             ),
@@ -199,6 +202,7 @@ class WorkflowAgent(Agent):
 
 class ConfigAgent(Agent):
     def __init__(self, config, instrument, loaded_ctx=None): #OT2 Liquidhandling robot
+        print("loaded_ctx", loaded_ctx, instrument)
         super().__init__(f"config_{instrument}", config, self._get_context(INITIAL_INSTRUMENT_PROMPT, loaded_ctx))
         self.rag = RAG(instrument)
         self.instrument = instrument

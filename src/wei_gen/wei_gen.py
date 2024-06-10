@@ -63,31 +63,25 @@ class Session:
     def workflow_step(self):
         temp_start = time.time()
         workflow = self.workflow_gen_env.generate_code(self.history.get_generated("framework"))
-        self.history.add_agent_history("workflow", self.workflow_gen_env.ctx["coder"], workflow)
+        self.history.add_agent_history("workflow", self.workflow_gen_env.coder.ctx, workflow)
         print(f"Experiment Workflow generated  in {(time.time() - temp_start):.2f} seconds. Continuing...")
 
     def code_step(self):
         temp_start = time.time()
         code = self.code_gen_env.generate_code(self.history.get_generated("framework"), self.history.get_generated("workflow"))
-        self.history.add_agent_history("code", self.code_gen_env.ctx["coder"], code)
+        self.history.add_agent_history("code", self.code_gen_env.coder.ctx, code)
         print(f"Experiment Code generated in {(time.time() - temp_start):.2f} seconds. Continuing...")
 
     def config_step(self):
-        print("meep")
         config_instruments = self.workflow_gen_env.needs_config()
-        print("sssss23", len(config_instruments))
         if len(config_instruments) > 0:
             print(f"Config needed for {''.join(config_instruments)}. Continuing...", self.history.v)
-            user_values = self.history.v
-            framework = self.history.get_generated("framework")
-
-            print("hhmmm:", config_instruments, user_values, framework)
+            user_values = self.history.v["original_user_values"]
+            framework = self.history.v["generated_framework"]
             for instrument in config_instruments:
-                self.config_gen_env: ConfigGen = ConfigGen(config, instrument, self.history.v["config_agent_ctx"])
-                print("hM!?")
+                self.config_gen_env: ConfigGen = ConfigGen(self.config, instrument, self.history.v["config_agent_ctx"])
                 config = self.config_gen_env.generate_code(framework, user_values)
-                print("config", config)
-                self.history.add_agent_history("config", self.config_gen_env.ctx, config)
+                self.history.add_agent_history("config", self.config_gen_env.coder.ctx, config)
 
     def call_gen_env(self, agent: str, user_input: str) -> str:
         """
@@ -96,19 +90,21 @@ class Session:
         # self._handle_history(session_id)
         if agent == "framework":
             resp = self.framework.call(user_input)
+            if self.history.v["generated_framework"] != "":
+                resp = None
             self.history.add_agent_history("framework", self.framework.ctx, resp)
             return resp
         elif agent == "workflow":
             resp = self.workflow_gen_env.call_coder(user_input)
-            self.history.add_agent_history("workflow", self.workflow_gen_env.ctx, resp)
+            self.history.add_agent_history("workflow", self.workflow_gen_env.coder.ctx, self.workflow_gen_env.code)
             return resp
         elif agent == "config":
             resp = self.config_gen_env.call_coder(user_input)
-            self.history.add_agent_history("config", self.config_gen_env.ctx, resp)
+            self.history.add_agent_history("config", self.config_gen_env.coder.ctx, self.config_gen_env.code)
             return resp
         elif agent == "code":
             resp = self.code_gen_env.call_coder(user_input)
-            self.history.add_agent_history("code", self.code_gen_env.ctx,resp)
+            self.history.add_agent_history("code", self.code_gen_env.coder.ctx, self.code_gen_env.code)
             return resp
         else:
             pass # TODO raise exception

@@ -24,7 +24,6 @@ def init():
     data = request.json
     user_session_id = data.get('session_id', '')
     cached_session = sessions.get(user_session_id, None)
-    print("SS", user_session_id, cached_session)
 
     if cached_session: # load cached session
         print("loading cached session")
@@ -38,7 +37,6 @@ def init():
         session = weigen.new_session()
         session_id = session.session_id
         sessions[session_id] = session
-        data = request.json
         user_description = data.get('user_description', '')
         user_values = data.get('user_values', "")
         session.framework_step(user_description, user_values)
@@ -78,14 +76,11 @@ def code_step(session_id):
 @app.route('/session/<session_id>/config_step', methods=['POST'])
 def config_step(session_id):
     global sessions
-    print("ss")
     session = sessions.get(session_id)
-    print("ksjdahjkhsjakdsa")
     if session is None:
         return jsonify({"error": "Session not found"}), 404
 
     try:
-        print("sssssss2")
         session.config_step()
         return jsonify({"message": session.get_history()}), 200
     except Exception as e:
@@ -112,7 +107,7 @@ def call_gen_env(session_id, agent):
     try:
         response = session.call_gen_env(agent, user_msg)
         print("Response from call_gen_env:", response)  # Debugging print
-        return jsonify({"response": session.get_history()}), 200
+        return jsonify({"message": session.get_history()}), 200
     except Exception as e:
         print("Exception occurred:", e)  # Debugging print
         return jsonify({"error": str(e)}), 400
@@ -128,6 +123,18 @@ def get_history(session_id):
 
     history = session.get_history()
     return jsonify(history), 200
+
+@app.route('/session/<session_id>/update_generated/<agent>', methods=['POST'])
+def update_generated(session_id, agent):
+    global sessions
+    session = sessions.get(session_id)
+    if session is None:
+        return jsonify({"error": "Session not found"}), 404
+
+    data = request.json
+    generated_content = data.get('new_generated')
+    session.modify_generated_data(agent, generated_content)
+    return jsonify({"message": session.get_history()}), 200
 
 if __name__ == '__main__':
     app.run(debug=True)

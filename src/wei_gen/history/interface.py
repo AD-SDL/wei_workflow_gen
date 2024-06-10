@@ -78,14 +78,13 @@ class History:
 
 
     def update_generated(self, agent_type: str, generated_content: Any) -> None:
+        print("updating", agent_type, generated_content)
         self.v[f"generated_{agent_type}"] = generated_content
         self._save_history()
 
     def get_generated(self, agent_type: str):
         return self.v[f"generated_{agent_type}"]
     
-
-
     def get_user_values(self):
         print("original_user_values", self.v["original_user_values"],self.v)
         return self.v["original_user_values"]

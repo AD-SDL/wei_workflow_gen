@@ -1,0 +1,17 @@
+{
+    "version": "0.0.1",
+    "session_id": "210a9669-9ff5-4f90-b920-277a194ba6e5",
+    "timestamp": 1717794821.197856,
+    "validity": 0,
+    "original_user_description": "Run PCR with 3 thermocycling cycles and seal plate for 20 minutes at 175 celsius. \nFor the PCR liquid preparation and transfer, you have access to the following materials: \n\nMaster Mix:\n1.) Biowater (10 mL) \n2.) 5x Reaction Buffer (~1mL) \n3.) DNA Polymerase (~40ul) \n4.) DNTPs (~200 uL) \n5.) GC Enhancer (~1mL)\n6.) Empty tube to store materials 1.) to 5.) \n\nDNA:\n7.) Forward Primers (~20ul per well)\n8.) Reverse primers(~20ul per well)\n9.) Template DNA strands (~20ul per well)\n10.) Final Plate for all materials",
+    "original_user_values": "1.) Transfer Biowater liquid 3 times with 676 uL each. Drop the tip on the last time. \n2.) Transfer 720 uL of 5x Reaction Buffer with 3 mix cycles and 500 uL mix volume per cycle. Drop the tip after. \n3.) Transfer 12 uL of DNA Polymerase 2 times with 3 mix cycles and 20 uL of mix volume per cycle. Drop the tip on the last time.\n4.) Transfer 108 uL of DNTPs with 3 mix cycles and 600 uL of mix volume per cycle. Drop the tip after.\n5.) Transfer 720 uL of GC Enhancer with 7 mix cycles and 700 uL of mix volume per cycle. Drop the tip after. \n6.) Transfer 15 uL of Master Mix liquid 2 times. Do not drop the tip. \n7.) Transfer 20 uL of forward primer liquid 1 times with 3 mix cycles and 15 uL of mix volume per cycle. Drop the tip. \n8.) Transfer 20 uL of backward primer liquid 1 times with 3 mix cycles and 15 uL of mix volume per cycle. Drop the tip. \n9.) Transfer 20 uL of template liquid 1 times with 3 mix cycles and 15 uL of mix volume per cycle. Drop the tip.",
+    "framework_agent_ctx": null,
+    "workflow_agent_ctx": null,
+    "code_agent_ctx": null,
+    "validator_agent_ctx": null,
+    "config_agent_ctx": null,
+    "generated_framework": "",
+    "generated_code": "",
+    "generated_workflow": "",
+    "generated_config": ""
+}

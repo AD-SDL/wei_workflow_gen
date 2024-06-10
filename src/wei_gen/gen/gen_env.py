@@ -13,13 +13,10 @@ class GenEnv:
         self.test_code = ""
         self.max_attempts = 3
 
-        self.ctx ={
-            "coder": [],
-            "validator": []
-        }
 
     def call_coder(self, user_input):
-        return self.coder.call_engine(user_input)
+        print("Calling coder...", user_input)
+        return self.coder.call(user_input)
     
     def set_code(self, generated_code):
         self.code = generated_code
@@ -55,28 +52,23 @@ class WorkflowGen(GenEnv):
             self._handle_errors(err)
             is_valid, err = self._is_workflow_valid()
             attempts += 1
-        self.ctx["coder"] = self.coder.ctx
         return self.code
     
     def needs_config(self) -> list:
         config_instruments = []
         print(self.config["needs_config"])
         for module in self.config["needs_config"]:
-            print()
             if module in self.code:
                 config_instruments.append(module)
         return config_instruments
     
 class ConfigGen(GenEnv):
-    def __init__(self, config, instrument, loaded_code_ctx):
-        print("ooop")
+    def __init__(self, config, instrument, loaded_code_ctx = None):
         coder: ConfigAgent = ConfigAgent(config, instrument, loaded_code_ctx)
-        print("uppppp")
         super().__init__(config, coder, None)
 
     def generate_code(self, experiment_framework, user_values):
         self.code = self.coder.gen_instrument_config(experiment_framework, user_values)
-        self.ctx["coder"] = self.coder.ctx
         return self.code
 
 
@@ -89,9 +81,8 @@ class CodeGen(GenEnv):
     def generate_code(self, experiment_framework, workflow):
         full_resp = self.coder.gen_code(experiment_framework, workflow)
         self.code = self.coder.get_code()
-        self.ctx["coder"] = self.coder.ctx
         return self.code
-    
+    #22da1bde-0737-41fe-88c2-2e73440f4434
 
 
 
