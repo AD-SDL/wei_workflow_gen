@@ -5,9 +5,9 @@ import numpy as np
 import os
 import json
 from typing import Any, Dict, List, Union
-from .prompts import INITIAL_ORCHESTRATION_PROMPT, INITIAL_CODE_PROMPT, INITIAL_VALIDATOR_PROMPT, INITIAL_WORKFLOW_PROMPT, INITIAL_INSTRUMENT_PROMPT
+from .prompts import INITIAL_ORCHESTRATION_PROMPT, INITIAL_CODE_PROMPT, INITIAL_VALIDATOR_PROMPT, INITIAL_WORKFLOW_PROMPT, INITIAL_INSTRUMENT_PROMPT, STEPS_EXAMPLE_JSON
 from rag.interface import RAG
-
+from z3 import *
 
 class Agent:
     def __init__(self, agent_type: str, config: Any, initial_prompt: List[Dict[str, str]]) -> None:
@@ -144,7 +144,59 @@ class FrameworkAgent(Agent):
     
     def gen_experiment_framework(self, user_input: str) -> str:
         prompt = f"Create a step by step plan of the following experiment {user_input} ##### The following is list of all instruments at your disposal {self.all_instruments_str}, YOU MUST ONLY USE THESE INSTRUMENTS. Make sure to break down large objectives into a smaller, granular tasks. Your responses should always be clear and concise, your should ONLY respond with this step by step plan."
-        return self.call(prompt)
+        max_tries = 3
+        framework =  self.call(prompt)
+        for _ in range(max_tries):
+            instrument_json = self._extract_instrument_order(framework)
+            solver, instrument_vars = self.json_to_z3_script(instrument_json)  
+            success, result = self.execute_z3_script(solver, instrument_vars)
+            print(success, result)
+            if success:
+                return framework
+            
+            # Try generation again
+            prompt_retry = f"The previous framework failed to be validate due to there not being a logical flow of steps between the different instruments. Ensure that objects move between instruments in logical order."
+            framework = self.call(prompt_retry)
+        return "Failed to generate a valid experiment plan. Please try again."
+
+    def _extract_instrument_order(self, framework) -> str:
+        prompt = f"Can you distill this experiment plan an simple order of operations? make sure that there is a transportation instruction for moving items around the lab, such as use of the pf400 to move a plate between robots ##### The following is list of all instruments at your disposal {self.all_instruments_str}, YOU MUST ONLY USE THESE INSTRUMENTS ##### {framework} ##### IMPORTANT: You must ONLY respond in json format, example: {STEPS_EXAMPLE_JSON}."
+        json_instruments =  self.transient_call(prompt)
+        return json_instruments
+    
+    def json_to_z3_script(self, json_text: str):
+        json_text = json_text.replace("```json", "").replace("```", "")
+        data = json.loads(json_text)
+        s = Solver()
+        prev_instrument = None
+        instrument_vars = {}
+
+        for i, step in enumerate(data['steps']):
+            # current_action = step['action']
+            current_instrument = step['instrument']
+
+            # Add the instrument to the variables if not already added
+            if current_instrument not in instrument_vars:
+                instrument_vars[current_instrument] = Bool(f"use_{current_instrument}")
+
+            if prev_instrument and prev_instrument != current_instrument:
+                transfer_exists = Bool(f"transfer_{prev_instrument}_to_{current_instrument}_{i}")
+                s.add(transfer_exists)
+                s.add(Implies(transfer_exists, And(instrument_vars[prev_instrument], instrument_vars[current_instrument])))
+
+            prev_instrument = current_instrument
+
+        return s, instrument_vars
+
+    def execute_z3_script(self, solver, instrument_vars):
+        """Executes the Z3 solver and returns the results."""
+        if solver.check() == sat:
+            model = solver.model()
+            result = {str(var): model[var] for var in instrument_vars.values() if model[var]}
+            return True, result
+        else:
+            return False, "No solution exists with the given constraints."
+
 
 class CodeAgent(Agent):
     def __init__(self, config, loaded_ctx=None):

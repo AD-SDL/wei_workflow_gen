@@ -7,6 +7,7 @@ INITIAL_ORCHESTRATION_PROMPT = [
 # TODO, provide examples, maybe after testing and getting more data
 
 
+
 def gen_coder_prompt(code_str):
     return f"""**Role**: You are a software programmer.
 **Task**: As a programmer, you are required to complete the function. Use a Chain-of-Thought approach to break
@@ -187,3 +188,71 @@ INITIAL_INSTRUMENT_PROMPT = [
         "content": "Assume the role of an intelligent assistant tasked with generating a YAML config and instrument/robot that is used in an experiment.",
     }
 ]
+
+
+STEPS_EXAMPLE_JSON = """
+{
+  "steps": [
+    {
+      "action": "pipette",
+      "instrument": "ot2_pcr_alpha",
+      "details": {
+        "from": "Template DNA Strands container",
+        "to": "final plate",
+        "volume": "20 µL per well"
+      }
+    },
+    {
+      "action": "transfer",
+      "instrument": "pf400",
+      "details": {
+        "from": "ot2_pcr_alpha",
+        "to": "biometra",
+        "item": "final plate"
+      }
+    },
+    {
+      "action": "run_protocol",
+      "instrument": "biometra",
+      "details": {
+        "protocol": "thermocycling",
+        "cycles": 3
+      }
+    },
+    {
+      "action": "transfer",
+      "instrument": "pf400",
+      "details": {
+        "from": "biometra",
+        "to": "sealer.default",
+        "item": "final plate"
+      }
+    },
+    {
+      "action": "seal",
+      "instrument": "sealer",
+      "details": {
+        "temperature": 175,
+        "time": 20
+      }
+    },
+    {
+      "action": "transfer",
+      "instrument": "pf400",
+      "details": {
+        "from": "sealer.default",
+        "to": "storage or next step location",
+        "item": "final plate"
+      }
+    },
+    {
+      "action": "dispose",
+      "instrument": "pf400",
+      "details": {
+        "item": "waste materials",
+        "location": "wc.trash"
+      }
+    }
+  ]
+}
+"""
