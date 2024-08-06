@@ -5,18 +5,17 @@ wei_gen is a python package that takes a natural language description of an expe
 Interact with weigen with a [simple next.js app](https://github.com/nautsimon/wei-gen-client)
 
 ## wei_gen flow
-0. <u>Preparation</u>: Provide some sort of natural language description of the experiment. Could be the product of some sort of white paper description, output from pryankas module, or just casually human generated dialogue.
-0. <u>Validate experiment</u>: Using module `/about`s as context (≈5k tokens), check to see if the lab even has the tools to carry out the experiment (using the input from step 0). Use token logprobs for this, over 50% "yes" prob as the the experiment will continue.
-0. <u>Create experiment framework</u>: Using module `/about`s as context, generate a structure for the experiment (using the input from step 0).
-0. <u>Generate workflow</u>: Module `/about`s are fed as context, retrieve 2-3 examples of workflows from vector db (RAG) and insert into context. Use the experiment framework from step 2 as guidance.
+![weigen flow](https://res.cloudinary.com/dgmuzb9mm/image/upload/v1722982352/taoafbb2wsn9hjft9q4p.png)
+
+### Steps
+0. <u>Preparation</u>: Provide some sort of natural language description of the experiment along with values
+0. <u>Validate experiment</u>: Provide all `/about`s from all instruments in the lab as context (≈7k tokens). Ask underlying model to check if the experiement described in the input from step 1 can be carried out with the available resources. Use token logprobs for this, over 50% "yes" prob as the the experiment will continue.
+0. <u>Create experiment framework</u>: Using `/about`s as context, generate a structure for the experiment (using the input from step 0).
+0. <u>Validate experiment framework</u>: Using the [z3 SMT Solver](https://github.com/Z3Prover/z3), check if the logical flow of the plan makes sense, retry generation with feedback if unsatisfiable.
+0. <u>Make a short list of instruments to use</u>: Using `/about`s as context, make a short list of instruments to use as a precursor to the following step.
+0. <u>Generate workflow</u>: Module `/about`s are fed as context, list of instruments from previous step provided as suggestion, retrieve 2-3 examples of workflows from vector db (RAG) and insert into context. Use the experiment framework from step 2 as guidance.
 0. <u>Generate code</u>: Using previous messages as context, create python code logic for the entire experiment. Using an [AgentCoder](https://arxiv.org/abs/2312.13010v2) inspired scheme. 
 0. <u>Generate misc</u>: Using the previous information as context, generate any extra documents (init locations of pipets, etc.). 
-
-## Workflow Gen
-Currently refining this process but the general idea is that
-1. <u>Determine if multiple workflows are needed</u>: Using experiment framework, the module abouts, and a hardcoded example of a multiple workflow system (from color picker), ask for yes/no response if multiple workflows will needed. With the logprobs returned, this will determine if the `gen_workflow` or the `gen_workflows` prompt will be used.
-2. <u>Determine which instruments are needed</u>: Using the experiment framework and the module abouts, create a list of suggested instruments to use.
-3. <u>Generate workflow</u>: With the list of the suggested instruments, the experiment framework, and 2 - 3 workflow examples using RAG, create a workflow.  
 
 
 ## History
@@ -24,32 +23,27 @@ A feature of wei_gen is the ability to load and store sessions. This enables wei
 An example a of a session history is below
 
 ```json
+
 {
     "version": "0.0.1",
     "session_id": "f8954ec2-b1b4-413e-b566-ed4fe641536d",
     "timestamp": 0,
-    "framework_agent_ctx": [],
-    "workflow_agent_ctx": [],
-    "code_agent_ctx": [],
-    "validator_agent_ctx": [],
-    "original_user_input": "",
+    "validity": 0.6,
+    "original_user_description": "",
+    "original_user_values": "",
+    "framework_agent_ctx": None,
+    "workflow_agent_ctx": None,
+    "code_agent_ctx": None,
+    "validator_agent_ctx": None,
+    "config_agent_ctx": None,
     "generated_framework": "",
     "generated_code": "",
-    "generated_workflow": [],
-    "generated_config": [],
-    "status": {
-        "validation": false,
-        "framework": false,
-        "workflow": false,
-        "code": false,
-        "config": false,
-    },
+    "generated_workflow": "",
+    "generated_config": "",
 }
 ```
 
 The idea is that this entire json document can also be sent to a front end and be parsed into a clean and friendly UI.
-
-*ctx arrays's exclude agent system prompts.
 
 
 
@@ -57,11 +51,14 @@ The idea is that this entire json document can also be sent to a front end and b
 To run any tests, check out the scripts in [/scripts](src/scripts/) that have various examples of testing the different functions accessible on the wei_gen session.
 
 The weigen session class has the following functions that can be called on it
-- `gen_experiment_framework(self, user_input: str) -> str`
-- `gen_code(self, content: str) -> None`
-- `gen_workflow(self, user_input = "") -> None`
-- `gen_extra_configs(self) -> None`
-- `get_history -> json`
+- def execute_experiment(self, user_description: str, user_values = None) -> None:
+- def framework_step(self, user_description, user_values) -> None:
+- def workflow_step(self) -> None:
+- def code_step(self) -> None:
+- def config_step(self) -> None:
+- def call_gen_env(self, agent: str, user_input: str) -> str
+- def modify_generated_data(self, agent: str, user_input: str) -> None
+- def get_history(self) -> Dict[str, Any]
 
 
 
