@@ -1,7 +1,8 @@
-# wei_gen (v2) - wip
+# wei_gen (v2)
 wei_gen is a python package that takes a natural language description of an experiment and generates WEI workflows, code, and instrument initialization. wei_gen is packaged as a class, and can be imported into any python project or spun up as an API. Examples of usage are in `/scripts`.
 
 ## Frontend
+Interact with weigen with a simple next.js app
 https://github.com/nautsimon/wei_workflow_gen/tree/main
 
 ## wei_gen flow
