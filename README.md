@@ -1,8 +1,24 @@
 # wei_gen (v2)
 wei_gen is a python package that takes a natural language description of an experiment and generates WEI workflows, code, and instrument configs. wei_gen is packaged as a class, and can be imported into any python project or spun up as an API. Examples of usage are in `/scripts`. An API-ized verion of wei_gen can be found in `/api`.
 
+## Demo
+See the demo [here](https://youtu.be/PoWsh9-hheM)
+
 ## Frontend
 Interact with weigen with a [simple next.js app](https://github.com/nautsimon/wei-gen-client)
+
+## API
+The api wrapper of weigen can be found in `/src/api`. The following endpoints are supported.
+
+- /session/init - returns session history on success
+- /session/<session_id>/workflow_step - returns session history on success
+- /session/<session_id>/code_step - returns session history on success
+- /session/<session_id>/config_step - returns session history on success
+- /session/<session_id>/call_gen_env/<agent> - returns session history on success
+- /session/<session_id>/history - returns session history on success
+- /session/<session_id>/update_generated/<agent> - returns session history on success
+
+
 
 ## wei_gen flow
 ![weigen flow](https://res.cloudinary.com/dgmuzb9mm/image/upload/v1722982352/taoafbb2wsn9hjft9q4p.png)
