@@ -2,8 +2,8 @@
 wei_gen is a python package that takes a natural language description of an experiment and generates WEI workflows, code, and instrument initialization. wei_gen is packaged as a class, and can be imported into any python project or spun up as an API. Examples of usage are in `/scripts`.
 
 ## Frontend
-Interact with weigen with a simple next.js app
-https://github.com/nautsimon/wei_workflow_gen/tree/main
+Interact with weigen with a [simple next.js app](https://github.com/nautsimon/wei-gen-client)
+
 
 ## wei_gen flow
 0. <u>Preparation</u>: Provide some sort of natural language description of the experiment. Could be the product of some sort of white paper description, output from pryankas module, or just casually human generated dialogue.
@@ -11,10 +11,7 @@ https://github.com/nautsimon/wei_workflow_gen/tree/main
 0. <u>Create experiment framework</u>: Using module `/about`s as context, generate a structure for the experiment (using the input from step 0).
 0. <u>Generate workflow</u>: Module `/about`s are fed as context, retrieve 2-3 examples of workflows from vector db (RAG) and insert into context. Use the experiment framework from step 2 as guidance.
 0. <u>Generate code</u>: Using previous messages as context, create python code logic for the entire experiment. Using an [AgentCoder](https://arxiv.org/abs/2312.13010v2) inspired scheme. 
-    1. Generate code: In the future, this step should also use RAG to get similar code snippet examples.
-    2. Validate code (TBD): <br/>[Option 1]: Save the generated code into a file that can be used to validate the logic of both the workflow and the code together. Then logs from the can be used to iterate on this process, or trigger a modification of the workflow.<br/>
-    [Option 2]: Create mocks for the functions on the workflow. No need for AI in this step, just standard code gen. If the first option is not plausible, this is what we should do.<br/>[Option 3]: Combination of both. First run option 2 to see if logic is sound, then run option 1 to further validate the workflow.
-0. <u>Generate misc</u>: Using the previous information as context, generate any extra documents (init locations of pipets, etc.). This step will surely need RAG, and it will be beneficial to create some sort of database of examples. This kind of information could also be put in the module abouts (explanations about the initial setup of the module)
+0. <u>Generate misc</u>: Using the previous information as context, generate any extra documents (init locations of pipets, etc.). 
 
 ## Workflow Gen
 Currently refining this process but the general idea is that
@@ -55,30 +52,9 @@ The idea is that this entire json document can also be sent to a front end and b
 
 *ctx arrays's exclude agent system prompts.
 
-## Next steps / Things I need
-wei_gen will only be as good as the data it is provided. 
-1. <u>(IMPORTANT)</u> Test Environment - for validation and generating more examples, maturing abouts, potential finetuning, etc.
-    - RViz, can I run experiments?
-    - Any functions I can call to validate workflows?
-2. Get further understanding on modules so to enhance /abouts
-    - Add more information
-        - Starting positions
-        - Create some sort of knowledge graph between modules
-        - Information about default values
-        - need to define any set ranges or valid values
-        - cross-dependencies?
-    - Do I need the abouts for the missing modules (see bottom of readme)?
-    - If we can do a testing env, we can get more workflow examples
-    - NOTE: I am using a local version of all abouts concatenated (≈5000 tokens) until abouts are fully refined.
-3. Refine prompts
-    - Add more explanation of what a workflow is and how it will be used to the workflow agent system prompt.
-    - Add more examples/templates (look at wei_gen v1 more) in the prompts, especially for when creating experiment framework.
-4. Make the experiment validation step iterative, meaning a human can go back and forth with the wei_gen to get better understanding why the experiment isn't supported. This would involving another agent (critic/advisor agent), which inherits some of the workflow agent context to provide advice on what the human could do to change the experiment. Results from this back and forth would then be fed back to the orchestration agent.
-5. Add examples to initial orchestration agent.
 
 
 ## Running wei_gen
-*Still working on making this giga-easy to setup (will make a bash script), but this is what I have for now*<br/>
 To run any tests, check out the scripts in [/scripts](src/scripts/) that have various examples of testing the different functions accessible on the wei_gen session.
 
 The weigen session class has the following functions that can be called on it
