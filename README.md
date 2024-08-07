@@ -27,7 +27,7 @@ The api wrapper of weigen can be found in `/src/api`. The following endpoints ar
 0. <u>Preparation</u>: Provide some sort of natural language description of the experiment along with values
 0. <u>Validate experiment</u>: Provide all `/about`s from all instruments in the lab as context (≈7k tokens). Ask underlying model to check if the experiement described in the input from step 0 can be carried out with the available resources. Use token logprobs for this, over 50% "yes" prob as the the experiment will continue.
 0. <u>Create experiment framework</u>: Using `/about`s as context, generate a structure for the experiment (using the input from step 0).
-0. <u>Validate experiment framework</u>: Using the [z3 SMT Solver](https://github.com/Z3Prover/z3), check if the logical flow of the plan makes sense, retry generation with feedback if unsatisfiable.
+0. <u>Validate experiment framework</u>: Using the [z3 SMT Solver](https://github.com/Z3Prover/z3), check if the logical flow of the plan makes sense, retry generation with feedback if unsatisfiable. For more about this, check the Symbol AI section below.
 0. <u>Make a short list of instruments to use</u>: Using `/about`s as context, make a short list of instruments to use as a precursor to the following step.
 0. <u>Generate workflow</u>: Module `/about`s are fed as context, list of instruments from previous step provided as suggestion, retrieve 2-3 examples of workflows from vector db (RAG) and insert into context. Use the experiment framework from step 2 as guidance.
 0. <u>Generate code</u>: Using previous messages as context, create python code logic for the entire experiment. Using an [AgentCoder](https://arxiv.org/abs/2312.13010v2) inspired scheme. 
