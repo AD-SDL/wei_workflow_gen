@@ -1,5 +1,5 @@
 # wei_gen (v2)
-wei_gen is a python package that takes a natural language description of an experiment and generates WEI workflows, code, and instrument configs. wei_gen is packaged as a class, and can be imported into any python project or spun up as an API. Examples of usage are in `/scripts`. An API-ized verion of wei_gen can be found in `/api`.
+wei_gen is a python package that takes a natural language description of an experiment and generates WEI workflows, code, and instrument configs. wei_gen is packaged as a class, and can be imported into any python project or spun up as an API. Examples of usage are in `/scripts`. An API-ized version of wei_gen can be found in `/api`.
 
 ## Demo
 See the demo [here](https://youtu.be/PoWsh9-hheM)
@@ -25,7 +25,7 @@ The api wrapper of weigen can be found in `/src/api`. The following endpoints ar
 
 ### Steps
 0. <u>Preparation</u>: Provide some sort of natural language description of the experiment along with values
-0. <u>Validate experiment</u>: Provide all `/about`s from all instruments in the lab as context (≈7k tokens). Ask underlying model to check if the experiement described in the input from step 0 can be carried out with the available resources. Use token logprobs for this, over 50% "yes" prob as the the experiment will continue.
+0. <u>Validate experiment</u>: Provide all `/about`s from all instruments in the lab as context (≈7k tokens). Ask underlying model to check if the experiment described in the input from step 0 can be carried out with the available resources. Use token logprobs for this, over 50% "yes" prob as the the experiment will continue.
 0. <u>Create experiment framework</u>: Using `/about`s as context, generate a structure for the experiment (using the input from step 0).
 0. <u>Validate experiment framework</u>: Using the [z3 SMT Solver](https://github.com/Z3Prover/z3), check if the logical flow of the plan makes sense, retry generation with feedback if unsatisfiable. For more about this, check the Symbol AI section below.
 0. <u>Make a short list of instruments to use</u>: Using `/about`s as context, make a short list of instruments to use as a precursor to the following step.
@@ -34,7 +34,23 @@ The api wrapper of weigen can be found in `/src/api`. The following endpoints ar
 0. <u>Generate misc</u>: Using the previous information as context, generate any extra documents (init locations of pipets, etc.). 
 
 
-## History
+
+## Implementation
+
+### RAG
+RAG is used in some steps of generation to do in context learning. WEIGen's RAG implementation is done with [chromadb](https://github.com/chroma-core/chroma).
+
+### Symbolic AI
+WEIGen uses the [z3 SMT Solver](https://github.com/Z3Prover/z3) from Microsoft Research to validate the flow of a generated experiment. This implementation goes as follows:
+0. Using the natural language input and metadata from all instruments in the laboratory, determine if the experiment can be carried out
+1. Generate a markdown framework/plan for the experiment based on the input and metadata from all instruments in the laboratory.
+2. Using LLM, parse this plan into a json indexed by action with each entry having attributes such as the instrument in use.
+3. The json is parsed into a z3 solver instance, specifically checking if there is an instrument handling transportation between each step that has a change in the instrument in use
+4. Satisfiability of the resulting z3 statment is checked, if unsatisfiable, the restart at step 1 with some feedback.
+
+Using z3 in this manner was inspired by [Large Language Models Can Plan Your Travels Rigorously with Formal Verification Tools](https://arxiv.org/abs/2404.11891).
+
+### History
 A feature of wei_gen is the ability to load and store sessions. This enables wei_gen to not only be used in an iterative manner after an experiment is run (you can use wei_gen to help modify your workflow or code given errors that arose), but also allows wei_gen to work async. This enables wei_gen to be hosted as an API, as session data is persisted across various requests as long as a proper session UID is passed by the user.<br/>
 An example a of a session history is below
 
@@ -59,7 +75,7 @@ An example a of a session history is below
 }
 ```
 
-The idea is that this entire json document can also be sent to a front end and be parsed into a clean and friendly UI.
+The idea is that this entire json document can also be sent to a front end and be parsed into a clean and friendly UI ([see here](https://github.com/nautsimon/wei-gen-client)).
 
 
 
