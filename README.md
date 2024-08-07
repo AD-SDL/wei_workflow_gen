@@ -35,7 +35,7 @@ The api wrapper of weigen can be found in `/src/api`. The following endpoints ar
 
 
 
-## Implementation
+## Implementation Notes
 
 ### RAG
 RAG is used in some steps of generation to do in context learning. WEIGen's RAG implementation is done with [chromadb](https://github.com/chroma-core/chroma).
@@ -49,6 +49,9 @@ WEIGen uses the [z3 SMT Solver](https://github.com/Z3Prover/z3) from Microsoft R
 4. Satisfiability of the resulting z3 statment is checked, if unsatisfiable, the restart at step 1 with some feedback.
 
 Using z3 in this manner was inspired by [Large Language Models Can Plan Your Travels Rigorously with Formal Verification Tools](https://arxiv.org/abs/2404.11891).
+
+### LLMs
+The underlying model for each model can be augmented by the config (see below), the standard during testing was GPT4.
 
 ### History
 A feature of wei_gen is the ability to load and store sessions. This enables wei_gen to not only be used in an iterative manner after an experiment is run (you can use wei_gen to help modify your workflow or code given errors that arose), but also allows wei_gen to work async. This enables wei_gen to be hosted as an API, as session data is persisted across various requests as long as a proper session UID is passed by the user.<br/>
